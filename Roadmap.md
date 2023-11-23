@@ -1,6 +1,6 @@
 # Version Beta
  ## 0.1
- - Se connecter à spoty
+ - Se connecter à spoty - `Tom`
  - Ecouter une musique
  ## 0.2
  - Ecouter une liste de musique prédéfini (tirer aléatoirement)
