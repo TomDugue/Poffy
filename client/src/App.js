@@ -1,3 +1,83 @@
+import { useState } from "react";
+
+function App() {
+  //state (état, données)
+  const [fruits, setFruits] = useState([
+    { id: 1, nom: "Abricot" },
+    { id: 2, nom: "Banane" },
+    { id: 3, nom: "Cerise" },
+  ]);
+  //const voiture = <li>Tesla</li>;
+  //const voitures = [<li>Fiat</li>, <li>Audi</li>, <li>GMG</li>];
+
+  const [nouveauFruits, setNouveauFruits] = useState("");
+
+  //comportements
+  const handleButton = (id) => {
+    //copie du state
+    const fruitCopy = fruits.slice();
+    //const fruitCopy=[...fruits]; fait la meme chose
+    const fruitCopyUpdated = fruitCopy.filter((fruit) => fruit.id !== id);
+    //manipulation du state
+
+    //modifier mon state avec le setter
+    setFruits(fruitCopyUpdated);
+  };
+
+  const handleChange = (event) => {
+    const valueAfterChange = event.target.value;
+    console.log(event.target.value);
+    setNouveauFruits(valueAfterChange);
+  };
+
+  //const inputRef = useRef();
+  const handleSubmit = (event) => {
+    event.preventDefault(); //ne refresh pas la page
+    //copie du state
+    const NouveauFruitCopy = [...fruits];
+    //manipulation du state
+    const id= new Date().getTime()
+    const nom =nouveauFruits
+    NouveauFruitCopy.push({id:id,nom:nom})
+
+    //modifier mon state avec le setter
+    setFruits(NouveauFruitCopy);
+    setNouveauFruits("");
+  };
+
+  //render
+  return (
+    <div>
+      <h1>Liste de fruits</h1>
+      <ul>
+        {fruits.map((fruit) => {
+          return (
+            <li key={fruit.id}>
+              {fruit.nom}
+              <button onClick={() => handleButton(fruit.id)}>X</button>
+            </li>
+          );
+        })}
+      </ul>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={nouveauFruits}
+          type="text"
+          placeholder="Ajouter un fruit"
+          onChange={handleChange}
+        />
+        <button>Ajouter</button>
+      </form>
+    </div>
+  );
+}
+
+export default App;
+
+
+
+/*
+
 import logo from './logo.svg';
 import './App.css';
 import React, {Component} from 'react';
