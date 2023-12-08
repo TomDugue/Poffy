@@ -1,5 +1,5 @@
 # Poffy
-Blendtest using spotyfy
+Blindtest using spotify
 
 ## Installation
 You must have nodejs installed on your machine.
