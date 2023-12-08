@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<html>
+    <head>
+        <title>Page de paramètrage </title>
+    </head>
+    <body>
+        <div class = "container">
+            <div class ="d-flew align-items-start flex-column p-3"> 
+                <!-- partie de réglage du groupe de jeu -->
+                <div class="p-2"> 
+                        <!--
+                            /!\griser les paramètres pour les joueurs non admin/!\
+                            - styles musicaux 
+                            - temps pour deviner la musique
+                            - nombre de joueurs
+                            - en bas le nom des joueurs qui s'affiche
+                        -->
+
+                        <form class="d-flex align-items-center flex-column"> 
+                            <input class="form-control h-25 d-inline-block mb-1" type="text" placeholder="Styles musicaux" id="Id-Musique">
+                            <input class="form-control h-25 d-inline-block mb-1" type="text" placeholder="Nombres de joueurs" id="Id-Player">
+                            <input class="form-control h-25 d-inline-block" type="text" placeholder="Temps de jeux" id="Id-PalyTime">
+                            <button class="btn btn-outline-success mx-auto mt-1" id="button-valide-parameter">valide</button>
+                        </form>
+                    
+                </div>
+                <!-- partie historique du jeu -->
+                <div class="p-2"> 
+                    <div>
+                        <!--
+                            - Afficher les musiques qui sont passées pendant la partie dans une première partie suppérieur
+                            - Afficher les réponses des propositions des joueurs et si la réponse du joueur est du bon chanteur mais pas la bonne chanson alors 
+                            celle ci s'affiche en orange sinon en rouge et si la réponse est correcte elle s'affiche en vert pour tout le monde
+                        -->
+
+                    </div>
+                </div>
+                <!-- partie visualisation du jeu -->
+                <div  class="p-2"> 
+                    <div>
+                        <!--
+                            une zone où on peut voir le clip de la musique qui débuterai très flou et plus la musique déffile moins elle serait flou 
+                            le curseur de temps de la musique
+                        -->
+                    </div>
+                </div>
+            </div>
+            <div class ="d-flew align-items-start flex-column"> 
+                <!-- partie de proposition de reponse du jeu -->
+                <div  class="p-2"> 
+                    <div >
+                        <!--
+                            une zone pour remplir le nom de la musique que l'on pense avec un bouton pour valider
+                        -->
+                        <form class="input-group mb-3">
+                            <input class="form-control" type="text" placeholder="Nom de musique">
+                            <button class="btn btn-outline-success" id="button-valide-name-musique">valide</button>
+                        </div>
+                        
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-light text-center text-lg-start">
+                <!-- Copyright -->
+                <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+                © 2020 Copyright:
+                <a class="text-dark" href="https://mdbootstrap.com/">MDBootstrap.com</a>
+                </div>
+                <!-- Copyright -->
+            </footer>
+        </div>
+    </body>
+</html>
