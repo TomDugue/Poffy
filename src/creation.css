@@ -17,7 +17,7 @@ body {
 
 .play-button-container {
     position: relative;
-    top: 80px; /* Ajustez la valeur selon vos besoins pour déplacer le bouton vers le bas */
+    top: 80px; /* Ajustez la valeur */
 }
 
 .play-button {

@@ -1,0 +1,39 @@
+body {
+    background-color: #121212; /* Fond sombre */
+    color: #ffffff; /* Couleur du texte sur fond sombre */
+    /* Centrer tout le contenu */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.card {
+    background-color: #3498db; /* Couleur bleue électrique pour les cartes */
+    color: #ffffff; /* Couleur du texte sur les cartes bleues */
+}
+
+.masthead-heading {
+    font-family: 'Georgia', serif; /* Choisir une police de caractères adaptée */
+    font-size: 3rem; /* Ajuster la taille du texte */
+    font-weight: bold; /* Gras */
+    margin-bottom: 20px; /* Espacement en bas */
+}
+
+.letsGo-button-container {
+    position: relative;
+    top: 10px; /* Ajustez la valeur*/
+}
+
+/* Ajout de la classe .letsGo-btn */
+.letsGo-btn {
+    background-color: #138cdd;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
