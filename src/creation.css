@@ -4,3 +4,30 @@
     grid-template-rows: 100px 100px 100px 100px 100px;
     grid-gap: 10px;
 }
+
+body {
+    background-color: #121212; /* Fond sombre */
+    color: #ffffff; /* Couleur du texte sur fond sombre */
+}
+
+.card {
+    background-color: #3498db; /* Couleur bleue électrique pour les cartes */
+    color: #ffffff; /* Couleur du texte sur les cartes bleues */
+}
+
+.play-button-container {
+    position: relative;
+    top: 80px; /* Ajustez la valeur selon vos besoins pour déplacer le bouton vers le bas */
+}
+
+.play-button {
+    background-color: #138cdd;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
