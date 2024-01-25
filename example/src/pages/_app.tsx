@@ -1,31 +1,27 @@
-import { AppProps } from "next/app";
+import { ChakraProvider } from "@chakra-ui/react";
+import type { AppProps } from "next/app";
 import Head from "next/head";
-import "../styles/globals.css";
+import { chakraTheme } from "../common/chakra-theme";
+import { SpotifyClientProvider } from "../hooks/spotify-client";
 
-const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>React Web Playback SDK Demo App</title>
-        <meta property="og:title" content="React Web Playback SDK Demo App" />
-        <meta
-          property="og:image"
-          content="https://react-spotify-web-playback-sdk.vercel.app/react-spotify-web-playback-sdk-logo.png"
-        />
-        <meta
-          property="og:description"
-          content="an example app of react-spotify-web-playback-sdk which is published at npmjs.com."
-        />
-        <meta
-          property="og:url"
-          content="https://react-spotify-web-playback-sdk.vercel.app/"
-        />
+        <title>Spotify Clone App</title>
+        <meta name="description" content="Your spotify blind test app." />
+        <meta property="og:description" content="Your spotify blind test app." />
+        <meta property="og:title" content="Poffy" />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="React Web Playback SDK Demo App" />
+        <meta property="og:site_name" content="Poffy" />
       </Head>
-      <Component {...pageProps} />
+      <ChakraProvider theme={chakraTheme}>
+        <SpotifyClientProvider>
+          <Component {...pageProps} />
+        </SpotifyClientProvider>
+      </ChakraProvider>
     </>
   );
-};
+}
 
 export default MyApp;

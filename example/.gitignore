@@ -32,3 +32,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# typescript
+*.tsbuildinfo
+
+# pathpida
+src/lib/$path.ts

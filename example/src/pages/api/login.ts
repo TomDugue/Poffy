@@ -1,18 +1,20 @@
-import { NextApiHandler } from "next";
-import { setCookie } from "nookies";
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiHandler } from "next";
 import { v4 as uuid } from "uuid";
+import { stringify } from "querystring";
 import {
   SPOTIFY_AUTHORIZE_URL,
   SPOTIFY_CLIENT_ID,
   SPOTIFY_REDIRECT_URI,
   SPOTIFY_SCOPES,
 } from "../../common/constant";
+import { setCookie } from "nookies";
 
 const handler: NextApiHandler = (req, res) => {
   if (req.method === "GET") {
     const state = uuid();
 
-    const redirectParams = new URLSearchParams({
+    const params = stringify({
       response_type: "code",
       client_id: SPOTIFY_CLIENT_ID,
       scope: SPOTIFY_SCOPES.join(" "),
@@ -22,17 +24,17 @@ const handler: NextApiHandler = (req, res) => {
 
     const secure = !req.headers.host?.includes("localhost");
     setCookie({ res }, "state", state, {
-      maxAge: 3600000,
+      maxAge: 3600,
       secure: secure,
       httpOnly: true,
       path: "/",
     });
 
-    const url = `${SPOTIFY_AUTHORIZE_URL}?${redirectParams.toString()}`;
+    const url = `${SPOTIFY_AUTHORIZE_URL}?${params}`;
 
     res.redirect(url);
   } else {
-    res.status(405).send("Method Not Allowed");
+    res.status(405).send("Method not Allowed");
   }
 };
 
