@@ -2,7 +2,7 @@ import { memo } from "react";
 import { useSpotifyPlayer } from "react-spotify-web-playback-sdk";
 import styles from "./PlayerController.module.css";
 
-export const PlayerController: React.VFC = memo(() => {
+export const PlayerController: React.FC = memo(() => {
   const player = useSpotifyPlayer();
 
   if (player === null) return null;

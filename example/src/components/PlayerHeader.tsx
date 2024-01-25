@@ -3,7 +3,7 @@ import { useSpotifyPlayer } from "react-spotify-web-playback-sdk";
 import styles from "./PlayerHeader.module.css";
 import { TextInput } from "./TextInput";
 
-export const PlayerHeader: React.VFC = () => {
+export const PlayerHeader: React.FC = () => {
   const [deviceName, setDeviceName] = useState("Spotify Player on Next.js");
 
   const spotifyPlayer = useSpotifyPlayer();

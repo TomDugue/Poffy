@@ -3,7 +3,7 @@ import { PlayerController } from "./PlayerController";
 import { StateConsumer } from "./StateConsumer";
 import styles from "./PlayerContent.module.css";
 
-export const PlayerContent: React.VFC<{ access_token: string }> = memo(
+export const PlayerContent: React.FC<{ access_token: string }> = memo(
   ({ access_token }) => {
     return (
       <div className={styles.root}>
