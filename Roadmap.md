@@ -1,11 +1,11 @@
 # Version Beta
  ## 0.1
  - Se connecter à spoty - `Tom`(OK)
- - Ecouter une musique - `Tom` (next step)
+ - Ecouter une musique - `Tom` (OK)
  ## 0.2
- - Ecouter une liste de musique prédéfini (tirer aléatoirement)
+ - Ecouter une liste de musique prédéfini (tirer aléatoirement) `Tom` (en cours)
  - Tester le titre de la chanson
- - Passer la chanson d'après
+ - Passer la chanson d'après `Tom` (en cours)
  ## 0.3
  - Tester le titre/ l'auteur
  - scorbord pendant et à la fin
