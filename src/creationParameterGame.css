@@ -13,6 +13,14 @@ body {
 .card {
     background-color: #3498db; /* Couleur bleue électrique pour les cartes */
     color: #ffffff; /* Couleur du texte sur les cartes bleues */
+    height: 100%; /* Définit la hauteur de la carte à 100% de son parent */
+    display: flex; /* Utilise Flexbox */
+    flex-direction: column; /* Aligne les éléments enfants en colonne */
+    justify-content: space-between; /* Espace équitablement les éléments enfants */
+    position: relative; /* Position relative pour les effets de néon */
+    padding: 5px; /* Ajout de marge intérieure pour éviter que le texte ne soit coupé par le glow */
+    box-shadow: 0 0 5px #3498db, 0 0 5px #3498db; /* Effet de néon */
+    border-radius: 10px; /* Coins arrondis */
 }
 
 .play-button-container {
@@ -30,4 +38,20 @@ body {
     align-items: center;
     justify-content: center;
     margin: auto;
+    padding: 5px; /* Ajout de marge intérieure pour éviter que le texte ne soit coupé par le glow */
+    box-shadow: 0 0 5px #3498db, 0 0 5px #3498db; /* Effet de néon */
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
