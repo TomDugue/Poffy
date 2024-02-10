@@ -4,8 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Accueil from './Accueil';
 import CreateOrJoin from './CreateOrJoin';
-import CreationParameterGame from './CreationParameterGame';
-import Room from './Room';
+import CreationParameterGame from './CreateParameterGame';
+import Room from './Room.js';
 
 const Stack = createStackNavigator();
 
