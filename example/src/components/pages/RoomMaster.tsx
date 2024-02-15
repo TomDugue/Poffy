@@ -20,6 +20,7 @@ import { SideNavigation } from "../shared/SideNavigation";
 import { Track, TrackSkeleton } from "../shared/Track";
 import { WithHeader } from "../shared/WithHeader";
 import { RoomPageContent } from "./Room";
+import { randomInt } from "crypto";
 
 export const RoomMasterPage: VFC = () => {
   // [ ] Tom | Create a room
@@ -28,7 +29,8 @@ export const RoomMasterPage: VFC = () => {
   //  If yes, redirect to the room
   // const data = useMe();
 
-  const roomId = "123456";
+  const roomId = makeid(6);
+  //const roomId = "123456";
   return (
     <ErrorBoundary>
       <Suspense fallback={<PageFallback />}>
@@ -39,3 +41,15 @@ export const RoomMasterPage: VFC = () => {
     </ErrorBoundary>
   );
 };
+
+function makeid(length:number) {
+    let result = '';
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
