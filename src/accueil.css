@@ -11,6 +11,8 @@ body {
 .card {
     background-color: #3498db; /* Couleur bleue électrique pour les cartes */
     color: #ffffff; /* Couleur du texte sur les cartes bleues */
+    padding: 5px; /* Ajout de marge intérieure pour éviter que le texte ne soit coupé par le glow */
+    box-shadow: 0 0 5px #3498db, 0 0 5px #3498db; /* Effet de néon */
 }
 
 .masthead-heading {

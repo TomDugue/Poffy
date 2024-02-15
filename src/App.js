@@ -1,4 +1,31 @@
-import { useState } from "react";
+// App.js
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Accueil from './Accueil';
+import CreateOrJoin from './CreateOrJoin';
+import CreationParameterGame from './CreationParameterGame';
+import Room from './Room';
+
+const Stack = createStackNavigator();
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Accueil">
+        <Stack.Screen name="Accueil" component={Accueil} />
+        <Stack.Screen name="CreateOrJoin" component={CreateOrJoin} />
+        <Stack.Screen name="CreationParameterGame" component={CreationParameterGame} />
+        <Stack.Screen name="Room" component={Room} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
+
+
+/*import { useState } from "react";
 
 function App() {
   //state (état, données)

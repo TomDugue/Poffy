@@ -1,0 +1,34 @@
+.conteneur {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 100px 100px 100px 100px 100px;
+    grid-gap: 10px;
+}
+
+body {
+    background-color: #121212; /* Fond sombre */
+    color: #ffffff; /* Couleur du texte sur fond sombre */
+}
+
+.card {
+    background-color: #3498db; /* Couleur bleue électrique pour les cartes */
+    color: #ffffff; /* Couleur du texte sur les cartes bleues */
+    height: 100%; /* Définit la hauteur de la carte à 100% de son parent */
+    display: flex; /* Utilise Flexbox */
+    flex-direction: column; /* Aligne les éléments enfants en colonne */
+    justify-content: space-between; /* Espace équitablement les éléments enfants */
+    position: relative; /* Position relative pour les effets de néon */
+    padding: 5px; /* Ajout de marge intérieure pour éviter que le texte ne soit coupé par le glow */
+    box-shadow: 0 0 5px #3498db, 0 0 5px #3498db; /* Effet de néon */
+    border-radius: 10px; /* Coins arrondis */
+}
+
+.button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: auto; /* Pour déplacer le bouton vers le bas de sa carte */
+}
+
+.card-text {
+    margin: auto 0; /* Centre le paragraphe verticalement */
+}
