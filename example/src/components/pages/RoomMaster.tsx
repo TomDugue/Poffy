@@ -1,55 +1,46 @@
-import { Box, Heading, HStack, Stack, useColorModeValue, Text, Icon, Circle, Center, Button, Editable, EditableInput, EditablePreview, PinInput, PinInputField } from "@chakra-ui/react";
-import { memo, Suspense, VFC } from "react";
-import {
-  useFollowedArtists,
-  useFeaturedPlaylists,
-  useMyTopArtists,
-  useMyTopTracks,
-  useMe,
-} from "../../hooks/spotify-api";
-import { range } from "../../lib/range";
-import { ArtistCard, ArtistCardSkeleton } from "../shared/ArtistCard";
+import { Suspense, useCallback, useContext, useEffect, useState, VFC } from "react";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
-import { Header } from "../shared/Header";
-import { HScrollable } from "../shared/HScrollable";
 import { Layout } from "../shared/Layout";
 import { PageFallback } from "../shared/PageFallback";
-import { PlaylistCard, PlaylistCardSkeleton } from "../shared/PlaylistCard";
 import { ResponsiveBottom } from "../shared/ResponsiveBottom";
 import { SideNavigation } from "../shared/SideNavigation";
-import { Track, TrackSkeleton } from "../shared/Track";
-import { WithHeader } from "../shared/WithHeader";
 import { RoomPageContent } from "./Room";
-import { randomInt } from "crypto";
+import { SocketContext } from "../../lib/socket";
 
 export const RoomMasterPage: VFC = () => {
-  // [ ] Tom | Create a room
-  //  Verify if the user already has a room
-  //  If not, create a new room
-  //  If yes, redirect to the room
-  // const data = useMe();
+  // [X] Tom | Create a room
+  // [ ] Tom | Detect if the user is already in a room
+  const socket = useContext(SocketContext);
+  const [roomId, setRoomId] = useState<string | undefined>(undefined);
 
-  const roomId = makeid(6);
-  //const roomId = "123456";
+  const handleRoomUpdate = useCallback((room) => {
+    setRoomId(room.id);
+    console.log("Room created: ", room.id);
+  }, []);
+
+  useEffect(() => {
+    // as soon as the component is mounted, do the following tasks:
+
+    // emit USER_ONLINE event
+    if (roomId === undefined) socket.emit("CREATE_ROOM"); 
+
+    // subscribe to socket events
+    socket.on("ROOM_CREATION", handleRoomUpdate); 
+
+    return () => {
+      // before the component is destroyed
+      // unbind all event handlers used in this component
+      socket.off("ROOM_CREATION", handleRoomUpdate);
+    };
+  }, [socket, roomId]);
+  
   return (
     <ErrorBoundary>
       <Suspense fallback={<PageFallback />}>
-        <Layout side={<SideNavigation />} bottom={<ResponsiveBottom />}>
-            <RoomPageContent roomId={roomId} />
+        <Layout side={<SideNavigation/>} bottom={<ResponsiveBottom />}>
+          { !(roomId === undefined) && (<RoomPageContent roomId={roomId} />)}
         </Layout>
       </Suspense>
     </ErrorBoundary>
   );
 };
-
-function makeid(length:number) {
-    let result = '';
-    const characters = '0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-}

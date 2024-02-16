@@ -24,6 +24,8 @@
     "react-icons": "^4.3.1",
     "react-spotify-web-playback-sdk": "^3.0.1",
     "react-use": "^17.3.2",
+    "socket.io": "^4.7.4",
+    "socket.io-client": "^4.7.4",
     "spotify-web-api-js": "^1.5.2",
     "swr": "^1.2.0",
     "uuid": "^8.3.2"

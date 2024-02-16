@@ -2,7 +2,6 @@ import {
   Box,
   Grid,
   Heading,
-  HStack,
   Icon,
   IconButton,
   Image,
@@ -14,6 +13,8 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Router, { useRouter } from "next/router";
@@ -22,17 +23,13 @@ import { MdClose, MdSearch } from "react-icons/md";
 import { useCategories, useSearch } from "../../hooks/spotify-api";
 import { useDebounceValue } from "../../hooks/useDebounceValue";
 import { pagesPath } from "../../lib/$path";
-import { AlbumCard } from "../shared/AlbumCard";
-import { ArtistCard } from "../shared/ArtistCard";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { Header } from "../shared/Header";
-import { HScrollable } from "../shared/HScrollable";
 import { Layout } from "../shared/Layout";
 import { PageFallback } from "../shared/PageFallback";
 import { PlaylistCard } from "../shared/PlaylistCard";
 import { ResponsiveBottom } from "../shared/ResponsiveBottom";
 import { SideNavigation } from "../shared/SideNavigation";
-import { Track } from "../shared/Track";
 import { WithHeader } from "../shared/WithHeader";
 
 export const SearchPage: VFC = () => {
@@ -75,7 +72,7 @@ const SearchPageContent: VFC = () => {
             <Input
               type="text"
               placeholder="Search"
-              aria-label="Search artists, albums, playlists and tracks."
+              aria-label="Search playlists."
               variant="filled"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -157,68 +154,21 @@ const NoSearching: VFC = memo(() => {
 
 const SearchResult: VFC<{ query: string }> = memo(({ query }) => {
   const { data: searched } = useSearch(
-    query ? [query, ["album", "artist", "playlist", "track"], { limit: 6 }] : null,
+    query ? [query, [ "playlist" ], { limit: 50 }] : null,
   );
 
-  const notFound =
-    searched?.albums?.total === 0 &&
-    searched.artists?.total === 0 &&
-    searched.tracks?.total === 0 &&
-    searched.playlists?.total === 0;
-
-  return notFound ? (
+  return searched?.playlists?.total === 0 ? (
     <Box p="8">
       <Heading>No results found for &quot;{query}&quot;.</Heading>
     </Box>
   ) : (
-    <Stack spacing="8">
-      {!!searched?.artists?.total && (
-        <Stack>
-          <Heading fontSize="2xl">Artists</Heading>
-          <HScrollable>
-            <HStack spacing="5">
-              {searched?.artists?.items.map((artist) => (
-                <ArtistCard key={artist.id} artist={artist} />
-              ))}
-            </HStack>
-          </HScrollable>
-        </Stack>
-      )}
-      {!!searched?.albums?.total && (
-        <Stack>
-          <Heading fontSize="2xl">Albums</Heading>
-          <HScrollable>
-            <HStack spacing="5">
-              {searched?.albums?.items.map((album) => (
-                <AlbumCard key={album.id} album={album} />
-              ))}
-            </HStack>
-          </HScrollable>
-        </Stack>
-      )}
-      {!!searched?.playlists?.total && (
-        <Stack>
-          <Heading fontSize="2xl">Playlists</Heading>
-          <HScrollable>
-            <HStack spacing="5">
-              {searched?.playlists?.items.map((playlist) => (
-                <PlaylistCard key={playlist.id} playlist={playlist} />
-              ))}
-            </HStack>
-          </HScrollable>
-        </Stack>
-      )}
-      {!!searched?.tracks?.total && (
-        <Stack>
-          <Heading fontSize="2xl">Tracks</Heading>
-          <Stack spacing="0">
-            {searched?.tracks?.items.map((track, index) => (
-              <Track key={track.id} track={track} index={index} />
-            ))}
-          </Stack>
-        </Stack>
-      )}
-    </Stack>
+    <Wrap spacing="3">
+      {searched?.playlists?.items.map((playlist) => (
+          <WrapItem key={playlist.id}>
+            <PlaylistCard playlist={playlist} />
+          </WrapItem>
+      ))}
+    </Wrap>
   );
 });
 
