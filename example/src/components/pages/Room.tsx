@@ -1,4 +1,4 @@
-import { Box, Heading, HStack, useColorModeValue, Text, Center, Button, Editable, EditableInput, EditablePreview, PinInput, PinInputField } from "@chakra-ui/react";
+import { Box, Heading, HStack,Stack,Input, useColorModeValue, Text, Center, Button, Editable, EditableInput, EditablePreview, PinInput, PinInputField } from "@chakra-ui/react";
 import { Suspense, useEffect, useState, VFC, useContext } from "react";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { Header } from "../shared/Header";
@@ -49,6 +49,21 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
       setStatus(room?.status);
     }
   }, [room]);
+
+  const setAnswer = () => {
+    // Check if the answer is not empty before sending it to the server
+    if (answer.trim() === "") {
+      // Handle empty answer case, you may want to display an error message
+      console.error("Answer cannot be empty");
+      return;
+    }
+
+    // Send the answer to the server
+    socket.emit("TRY_SONG", { answer });
+
+    // redirect to the room page
+    router.push(pagesPath.master.$url());
+  };
   
 
   // [ ] Syndelle | This is the page to access the room
@@ -70,25 +85,73 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
           )}
           {// [ ] Noémie | Display the input and send it to the server
           status === "playing" && (
+            <Stack>
+            <Input
+              placeholder='Enter the title or the singer'
+              size='lg'
+              value={answer}
+            />
+            <Button onClick={setAnswer}>Submit Answer</Button>
+          </Stack>
             
           )}
           {// [ ] Noémie | Display the score
-          status === "finished" && (
+          status === "finished" && ( //truc en attente pour ne pas faire beug
+            <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
+            <Box p={5} shadow='md'
+                borderRadius="lg"
+                bgColor={useColorModeValue("gray.100", "gray.700")}>
+                <Heading fontSize='xl'>Room {roomId}</Heading>
+                <Text mt={4}>
+                This is the room {roomId}. You can invite your friends to join you.
+                </Text>
+            </Box>
+            </HStack>
             
           )}
         </Center>
         {isRoomMaster && (
         <Center inset={0}>
         { // [ ] Tom | Manage start game
-        status === "waiting" && (
+        status === "waiting" && ( //truc en attente pour ne pas faire beug
+          <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
+          <Box p={5} shadow='md'
+              borderRadius="lg"
+              bgColor={useColorModeValue("gray.100", "gray.700")}>
+              <Heading fontSize='xl'>Room {roomId}</Heading>
+              <Text mt={4}>
+              This is the room {roomId}. You can invite your friends to join you.
+              </Text>
+          </Box>
+          </HStack>
           
         )}
         { // [ ] Tom | Manage next round
-        status === "playing" && (
+        status === "playing" && ( //truc en attente pour ne pas faire beug
+          <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
+          <Box p={5} shadow='md'
+              borderRadius="lg"
+              bgColor={useColorModeValue("gray.100", "gray.700")}>
+              <Heading fontSize='xl'>Room {roomId}</Heading>
+              <Text mt={4}>
+              This is the room {roomId}. You can invite your friends to join you.
+              </Text>
+          </Box>
+          </HStack>
           
         )}
         { // [ ] Tom | Restart the game
-        status === "finished" && (
+        status === "finished" && ( //truc en attente pour ne pas faire beug
+          <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
+          <Box p={5} shadow='md'
+              borderRadius="lg"
+              bgColor={useColorModeValue("gray.100", "gray.700")}>
+              <Heading fontSize='xl'>Room {roomId}</Heading>
+              <Text mt={4}>
+              This is the room {roomId}. You can invite your friends to join you.
+              </Text>
+          </Box>
+          </HStack>
 
         )}
         </Center>
