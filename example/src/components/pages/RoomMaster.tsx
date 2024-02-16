@@ -10,32 +10,23 @@ import { SocketContext } from "../../lib/socket";
 export const RoomMasterPage: VFC = () => {
   // [X] Tom | Create a room
   // [ ] Tom | Detect if the user is already in a room
-  const socket = useContext(SocketContext);
+  //@ts-ignore
+  const {socket, room} = useContext(SocketContext);
+
+
   const [roomId, setRoomId] = useState<string | undefined>(undefined);
 
-  const handleRoomUpdate = useCallback((room) => {
-    if (room.id === undefined) {
-      return;
-    }
-    setRoomId(room.id);
-    console.log("Room created: ", room.id);
-  }, []);
-
   useEffect(() => {
-    // as soon as the component is mounted, do the following tasks:
-
-    // emit USER_ONLINE event
-    socket.emit("CREATE_ROOM"); 
-
-    // subscribe to socket events
-    socket.on("ROOM_UPDATE", handleRoomUpdate); 
-
-    return () => {
-      // before the component is destroyed
-      // unbind all event handlers used in this component
-      socket.off("ROOM_UPDATE", handleRoomUpdate);
-    };
-  }, [socket, roomId]);
+    if (typeof room?.id === "string") {
+      setRoomId(room.id);
+    }
+  }, [room]);
+  
+  useEffect(() => {
+    if (roomId === undefined) {
+      socket.emit("CREATE_ROOM");
+    }
+  }, [socket]);
   
   return (
     <ErrorBoundary>

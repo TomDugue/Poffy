@@ -7,12 +7,12 @@ import { useRouter } from "next/router";
 export const PlaylistCard: VFC<{ playlist: SpotifyApi.PlaylistBaseObject }> = ({
   playlist,
 }) => {
-  const socket = useContext(SocketContext);
+  const {socket, room} = useContext(SocketContext);
   const router = useRouter();
   
   const setPlaylist = () =>{
-    socket.emit("SET_PLAYLIST", 
-      {playlist:{id: playlist.id, name: playlist.name}}
+    socket.emit("UPDATE_PARAMETERS", 
+      {playlist:{id: playlist.id, name: playlist.name, image: playlist.images[0]?.url}}
     );
     // redirect to the room page
     router.push(pagesPath.master.$url());

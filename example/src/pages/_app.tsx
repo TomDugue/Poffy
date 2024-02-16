@@ -4,8 +4,29 @@ import Head from "next/head";
 import { chakraTheme } from "../common/chakra-theme";
 import { SpotifyClientProvider } from "../hooks/spotify-client";
 import { SocketContext, socket } from '../lib/socket';
+import { useCallback, useEffect, useState } from "react";
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp(this: any, { Component, pageProps }: AppProps) {
+  const [room, setRoom] = useState<any>({});
+
+  const handleRoomUpdate = useCallback((newroom) => {
+    setRoom(newroom);
+    console.log("Room update: ", newroom);
+  }, []);
+  
+  useEffect(() => {
+
+    // subscribe to socket events
+    socket.on("ROOM_UPDATE", handleRoomUpdate); 
+
+    return () => {
+      // before the component is destroyed
+      // unbind all event handlers used in this component
+      socket.off("ROOM_UPDATE", handleRoomUpdate);
+    };
+  }, [handleRoomUpdate]);
+
+
   return (
     <>
       <Head>
@@ -18,7 +39,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <ChakraProvider theme={chakraTheme}>
         <SpotifyClientProvider>
-          <SocketContext.Provider value={socket}>
+          <SocketContext.Provider value={{socket, room}}>
             <Component {...pageProps} />
           </SocketContext.Provider>
         </SpotifyClientProvider>

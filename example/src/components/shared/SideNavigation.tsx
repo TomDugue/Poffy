@@ -7,16 +7,12 @@ import {
   useColorModeValue,
   Link,
   SkeletonText,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Tooltip,
   Button,
+  Image,
 } from "@chakra-ui/react";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
-import { useState, VFC } from "react";
+import { useCallback, useContext, useEffect, useState, VFC } from "react";
 import { IconType } from "react-icons";
 import { useUserPlaylists } from "../../hooks/spotify-api";
 import { useSecondaryTextColor } from "../../hooks/useSecondaryTextColor";
@@ -32,25 +28,64 @@ const useLinkColor = (isActive: boolean) => {
 
 export const SideNavigation: VFC = () => {
   const router = useRouter();
-  const socket = useContext(SocketContext);
-  const [playlist, setPlaylist] = useState<{name:string, id:string, image:string} | undefined>(undefined);
+  //@ts-ignore
+  const {socket, room} = useContext(SocketContext);
+  
+  const [playlist, setPlaylist] = useState<{id:string, name:string, image:string} | undefined>(undefined);
+
+  useEffect(() => {
+    if (typeof room?.playlist?.id === "string"
+      && typeof room?.playlist?.name === "string"
+      && typeof room?.playlist?.image === "string") {
+        // @ts-ignore
+        setPlaylist({
+          id:room.playlist.id,
+          name:room.playlist.name,
+          image:room.playlist.image
+        });
+    }
+  }, [room]);
 
   return (
     <Box h="full" w="80" bgColor={useColorModeValue(undefined, "gray.900")} p="5">
       <Text as="span" fontWeight="bold" fontSize={28}>
         Parameters
       </Text>
-      {/* Button to go to search */}
-      
-      <Button
-        mt="4"
-        onClick={() => router.push(pagesPath.search.$url())}
-        colorScheme="blue"
-        variant="outline"
-      >
-        Set the Playlist
-      </Button>
-      
+      { playlist === undefined ? (
+        <Button
+          mt="4"
+          onClick={() => router.push(pagesPath.search.$url())}
+          colorScheme="blue"
+          variant="outline"
+        >
+          Set the Playlist
+        </Button>
+      ) : (
+        <Stack
+          borderRadius="lg"
+          p="6"
+          bgColor={useColorModeValue("gray.100", "gray.700")}>
+          <Box height="32" width="32">
+            <Image
+              height="32"
+              width="32"
+              src={playlist.image}
+              alt={playlist.name}
+              borderRadius="xl"
+            />
+          </Box>
+          <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
+            {playlist.name}
+          </Text>
+          <Button
+            mt="4"
+            onClick={() => router.push(pagesPath.search.$url())}
+            colorScheme="blue"
+            variant="outline">
+            Change the playlist
+          </Button>
+        </Stack>
+      )}
     </Box>
   );
 };
@@ -120,7 +155,3 @@ const PlaylistLinksFallback: VFC = () => {
     </Stack>
   );
 };
-function useContext(SocketContext: any) {
-  throw new Error("Function not implemented.");
-}
-

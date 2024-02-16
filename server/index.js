@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
     // CREATE ROOM
     socket.on('CREATE_ROOM', () => {
         if (players[socket.id]) {
-            io.to(socket.id).emit('ROOM_UPDATE', players[socket.id]);
+            io.to(socket.id).emit('ROOM_UPDATE', rooms[players[socket.id]]);
             return;
         }
 
@@ -41,12 +41,14 @@ io.on("connection", (socket) => {
 
         rooms[roomid] = {
             id: roomid,
+            version: 0,
             players: [{id:socket.id, name: "Tom"}],
             master: socket.id,
             status: "waiting",
             playlist: {
                 id: null,
-                name: null
+                name: null,
+                image: null
             },
             curentTrack: {
                 id: null,
@@ -72,6 +74,7 @@ io.on("connection", (socket) => {
             return;
         }
         const roomid = players[socket.id];
+        console.log(`[UPDATE_PARAMETERS] ${roomid}`);
         if (rooms[roomid].master !== socket.id) {
             socket.emit('ERROR', 'You are not the master of this room');
             return;
@@ -82,9 +85,11 @@ io.on("connection", (socket) => {
         }
 
         // Update parameters
+        rooms[roomid].version += 1;
         if(room.playlist !== undefined) {
             rooms[roomid].playlist.id = room.playlist.id;
             rooms[roomid].playlist.name = room.playlist.name;
+            rooms[roomid].playlist.image = room.playlist.image;
             console.log(`[UPDATE_PARAMETERS] ${roomid} playlist: ${room.playlist.name}`);
         }
         if(room.rounds !== undefined) {
@@ -109,11 +114,12 @@ io.on("connection", (socket) => {
             return;
         }
         const roomid = players[socket.id];
+        console.log(`[NEXT_ROUND] ${roomid}`);
         if (rooms[roomid].master !== socket.id) {
             socket.emit('ERROR', 'You are not the master of this room');
             return;
         }
-        console.log(`[NEXT_ROUND] ${roomid}`);
+        rooms[roomid].version += 1;
         rooms[roomid].round += 1;
         rooms[roomid].status = "playing";
         rooms[roomid].success = {};
@@ -136,6 +142,7 @@ io.on("connection", (socket) => {
 
     // JOIN ROOM [roomid]
     socket.on('JOIN_ROOM', (roomid) => {
+        console.log(`[JOIN_ROOM] ${roomid} by ${socket.id}`);
         if (!rooms[roomid]) {
             socket.emit('ERROR', 'Room not found');
             return;
@@ -151,7 +158,7 @@ io.on("connection", (socket) => {
             return;
         }
 
-        console.log(`[JOIN_ROOM] ${roomid} by ${socket.id}`);
+        rooms[roomid].version += 1;
         rooms[roomid].players.push(socket.id);
         players[socket.id] = roomid;
         rooms[roomid].players.forEach(player => {
@@ -166,14 +173,29 @@ io.on("connection", (socket) => {
             return;
         }
         const roomid = players[socket.id];
+        
+        rooms[roomid].version += 1;
+        console.log(`[CHANGE_NAME] ${socket.id} to ${name}`);
         rooms[roomid].name[socket.id] = name;
         rooms[roomid].players.forEach(player => {
             io.to(player).emit('ROOM_UPDATE', rooms[roomid]);
         });
     });
 
+    // GET ROOM
+    socket.on('GET_ROOM', () => {
+        console.log(`[GET_ROOM] ${socket.id}`);
+        if (!players[socket.id]) {
+            socket.emit('ERROR', 'You are not in any room');
+            return;
+        }
+        const roomid = players[socket.id];
+        io.to(socket.id).emit('ROOM_UPDATE', rooms[roomid]);
+    });
+
     // TRY SONG
     socket.on('TRY_SONG', (s) => {
+        console.log(`[TRY_SONG] ${socket.id}`);
         if (!players[socket.id]) {
             socket.emit('ERROR', 'You are not in any room');
             return;
@@ -191,6 +213,8 @@ io.on("connection", (socket) => {
             socket.emit('ERROR', 'You already tried this song');
             return;
         }
+        
+        rooms[roomid].version += 1;
         rooms[roomid].score[socket.id] = 0;
         rooms[roomid].players.forEach(player => {
             io.to(player).emit('ROOM_UPDATE', rooms[roomid]);
@@ -206,7 +230,8 @@ io.on("connection", (socket) => {
         }
         const roomid = players[socket.id];
         delete players[socket.id];
-
+        
+        rooms[roomid].version += 1;
         if (rooms[roomid].master === socket.id) {
             // socket.id is the master of the room
             rooms[roomid].players.forEach(player => {

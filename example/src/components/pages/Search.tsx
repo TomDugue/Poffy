@@ -2,6 +2,7 @@ import {
   Box,
   Grid,
   Heading,
+  HStack,
   Icon,
   IconButton,
   Image,
@@ -19,7 +20,7 @@ import {
 import NextLink from "next/link";
 import Router, { useRouter } from "next/router";
 import { memo, Suspense, useEffect, useState, VFC } from "react";
-import { MdClose, MdSearch } from "react-icons/md";
+import { MdArrowBack, MdClose, MdSearch } from "react-icons/md";
 import { useCategories, useSearch } from "../../hooks/spotify-api";
 import { useDebounceValue } from "../../hooks/useDebounceValue";
 import { pagesPath } from "../../lib/$path";
@@ -65,30 +66,43 @@ const SearchPageContent: VFC = () => {
     <WithHeader
       header={
         <Header bgColor={useColorModeValue("white", "gray.800")}>
-          <InputGroup maxW="80">
-            <InputLeftElement pointerEvents="none">
-              <Icon as={MdSearch} fontSize="xl" />
-            </InputLeftElement>
-            <Input
-              type="text"
-              placeholder="Search"
-              aria-label="Search playlists."
-              variant="filled"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              borderRadius="full"
-            />
-            <InputRightElement>
+          <HStack>
+            <NextLink href={pagesPath.master.$url()} passHref>
               <IconButton
-                aria-label="clear text"
+                as="a"
                 variant="ghost"
                 size="sm"
                 borderRadius="full"
-                onClick={() => setSearchQuery("")}
-                icon={<Icon as={MdClose} fontSize="xl" />}
+                aria-label="Back to room page"
+                icon={<Icon as={MdArrowBack} fontSize="xl" />}
+                fontSize="xl"
               />
-            </InputRightElement>
-          </InputGroup>
+            </NextLink>
+            <InputGroup maxW="80">
+              <InputLeftElement pointerEvents="none">
+                <Icon as={MdSearch} fontSize="xl" />
+              </InputLeftElement>
+              <Input
+                type="text"
+                placeholder="Search"
+                aria-label="Search playlists."
+                variant="filled"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                borderRadius="full"
+              />
+              <InputRightElement>
+                <IconButton
+                  aria-label="clear text"
+                  variant="ghost"
+                  size="sm"
+                  borderRadius="full"
+                  onClick={() => setSearchQuery("")}
+                  icon={<Icon as={MdClose} fontSize="xl" />}
+                />
+              </InputRightElement>
+            </InputGroup>
+          </HStack>
         </Header>
       }>
       <Box px="4" marginTop="16" marginBottom="24">
