@@ -14,6 +14,9 @@ export const RoomMasterPage: VFC = () => {
   const [roomId, setRoomId] = useState<string | undefined>(undefined);
 
   const handleRoomUpdate = useCallback((room) => {
+    if (room.id === undefined) {
+      return;
+    }
     setRoomId(room.id);
     console.log("Room created: ", room.id);
   }, []);
@@ -22,15 +25,15 @@ export const RoomMasterPage: VFC = () => {
     // as soon as the component is mounted, do the following tasks:
 
     // emit USER_ONLINE event
-    if (roomId === undefined) socket.emit("CREATE_ROOM"); 
+    socket.emit("CREATE_ROOM"); 
 
     // subscribe to socket events
-    socket.on("ROOM_CREATION", handleRoomUpdate); 
+    socket.on("ROOM_UPDATE", handleRoomUpdate); 
 
     return () => {
       // before the component is destroyed
       // unbind all event handlers used in this component
-      socket.off("ROOM_CREATION", handleRoomUpdate);
+      socket.off("ROOM_UPDATE", handleRoomUpdate);
     };
   }, [socket, roomId]);
   

@@ -11,7 +11,7 @@ import { SideNavigation } from "../shared/SideNavigation";
 import { WithHeader } from "../shared/WithHeader";
 import NextLink from "next/link";
 import { pagesPath } from "../../lib/$path";
-import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
 
 export const CategoryPage: VFC<{ categoryId: string }> = ({ categoryId }) => {
   return (

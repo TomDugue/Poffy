@@ -1,9 +1,23 @@
 import { Box, Image, Skeleton, Stack, Text, useColorModeValue } from "@chakra-ui/react";
-import { VFC } from "react";
+import { VFC, useContext } from "react";
+import { SocketContext } from "../../lib/socket";
+import { pagesPath } from "../../lib/$path";
+import { useRouter } from "next/router";
 
 export const PlaylistCard: VFC<{ playlist: SpotifyApi.PlaylistBaseObject }> = ({
   playlist,
 }) => {
+  const socket = useContext(SocketContext);
+  const router = useRouter();
+  
+  const setPlaylist = () =>{
+    socket.emit("SET_PLAYLIST", 
+      {playlist:{id: playlist.id, name: playlist.name}}
+    );
+    // redirect to the room page
+    router.push(pagesPath.master.$url());
+  }
+
   return (
     <Stack
       width="44"
@@ -11,7 +25,8 @@ export const PlaylistCard: VFC<{ playlist: SpotifyApi.PlaylistBaseObject }> = ({
       borderRadius="lg"
       p="6"
       bgColor={useColorModeValue("gray.100", "gray.700")}
-      onClick={(e) => {}}
+      // [ ] Tom | Add onClick event to set the playlist to the room
+      onClick={setPlaylist}
       _hover={{ bgColor: useColorModeValue("gray.200", "gray.600") }}>
       <Box height="32" width="32">
         <Image

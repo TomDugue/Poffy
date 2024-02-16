@@ -10,9 +10,9 @@ let rooms = {};
 // rooms[roomid].status = "waiting" | "playing" | "finished"
 // rooms[roomid].playlist.Id = "playlistid"
 // rooms[roomid].playlist.Name = "playlistname"
-// rooms[roomid].currentSong.id = "songId"
-// romms[roomid].currentSong.name = "songName"
-// rooms[roomid].currentSong.artist = "artistName"
+// rooms[roomid].curentTrack.id = "songId"
+// romms[roomid].curentTrack.name = "songName"
+// rooms[roomid].curentTrack.artist = "artistName"
 // rooms[roomid].score = {socketid1: 0, socketid2: 0, ...}
 // rooms[roomid].success = {socketid1: {name:true, artist:true}, socketid2: {name:true, artist:true}, ...}
 // rooms[roomid].name = {socketid1: "name1", socketid2: "name2", ...}
@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
     // CREATE ROOM
     socket.on('CREATE_ROOM', () => {
         if (players[socket.id]) {
-            io.to(socket.id).emit('ROOM_CREATION', players[socket.id]);
+            io.to(socket.id).emit('ROOM_UPDATE', players[socket.id]);
             return;
         }
 
@@ -37,17 +37,18 @@ io.on("connection", (socket) => {
         do {
             roomid = makeid(6);
         } while (rooms[roomid]);
+        console.log(`[CREATE_ROOM] ${roomid}`);
 
         rooms[roomid] = {
             id: roomid,
-            players: [socket.id],
+            players: [{id:socket.id, name: "Tom"}],
             master: socket.id,
             status: "waiting",
             playlist: {
                 id: null,
                 name: null
             },
-            currentSong: {
+            curentTrack: {
                 id: null,
                 name: null,
                 artist: null
@@ -60,11 +61,12 @@ io.on("connection", (socket) => {
             playersMax: 5
         };
         players[socket.id] = roomid;
-        io.to(socket.id).emit('ROOM_CREATION', rooms[roomid]);
+        io.to(socket.id).emit('ROOM_UPDATE', rooms[roomid]);
     });
 
     // UPDATE PARAMETERS
     socket.on('UPDATE_PARAMETERS', (room) => {
+        // Check Authorization
         if (!players[socket.id]) {
             socket.emit('ERROR', 'You are not in any room');
             return;
@@ -74,10 +76,27 @@ io.on("connection", (socket) => {
             socket.emit('ERROR', 'You are not the master of this room');
             return;
         }
-        rooms[roomid].playlist.id = room.playlist.id;
-        rooms[roomid].playlist.name = room.playlist.name;
-        rooms[roomid].rounds = room.rounds;
-        rooms[roomid].playersMax = room.playersMax;
+        if(room.playlist === undefined && room.rounds === undefined && room.playersMax === undefined) {
+            socket.emit('ERROR', 'No parameters to update');
+            return;
+        }
+
+        // Update parameters
+        if(room.playlist !== undefined) {
+            rooms[roomid].playlist.id = room.playlist.id;
+            rooms[roomid].playlist.name = room.playlist.name;
+            console.log(`[UPDATE_PARAMETERS] ${roomid} playlist: ${room.playlist.name}`);
+        }
+        if(room.rounds !== undefined) {
+            rooms[roomid].rounds = room.rounds;
+            console.log(`[UPDATE_PARAMETERS] ${roomid} rounds: ${room.rounds}`);
+        }
+        if(room.playersMax !== undefined) {
+            rooms[roomid].playersMax = room.playersMax;
+            console.log(`[UPDATE_PARAMETERS] ${roomid} playersMax: ${room.playersMax}`);
+        }
+    
+        // Send update to all players
         rooms[roomid].players.forEach(player => {
             io.to(player).emit('ROOM_UPDATE', rooms[roomid]);
         });
@@ -94,6 +113,7 @@ io.on("connection", (socket) => {
             socket.emit('ERROR', 'You are not the master of this room');
             return;
         }
+        console.log(`[NEXT_ROUND] ${roomid}`);
         rooms[roomid].round += 1;
         rooms[roomid].status = "playing";
         rooms[roomid].success = {};
@@ -104,10 +124,10 @@ io.on("connection", (socket) => {
             });
             return;
         }
-        rooms[roomid].currentSong = {
-            id: room.currentSong.id,
-            name: room.currentSong.name,
-            artist: room.currentSong.artist
+        rooms[roomid].curentTrack = {
+            id: room.curentTrack.id,
+            name: room.curentTrack.name,
+            artist: room.curentTrack.artist
         };
         rooms[roomid].players.forEach(player => {
             io.to(player).emit('ROUND_START', rooms[roomid]);
@@ -131,6 +151,7 @@ io.on("connection", (socket) => {
             return;
         }
 
+        console.log(`[JOIN_ROOM] ${roomid} by ${socket.id}`);
         rooms[roomid].players.push(socket.id);
         players[socket.id] = roomid;
         rooms[roomid].players.forEach(player => {
@@ -202,7 +223,6 @@ io.on("connection", (socket) => {
             });
         }
     });
-
 });
 
 io.listen(4000);

@@ -12,6 +12,7 @@ import {
   SliderFilledTrack,
   SliderThumb,
   Tooltip,
+  Button,
 } from "@chakra-ui/react";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
@@ -21,6 +22,7 @@ import { useUserPlaylists } from "../../hooks/spotify-api";
 import { useSecondaryTextColor } from "../../hooks/useSecondaryTextColor";
 import { pagesPath } from "../../lib/$path";
 import { range } from "../../lib/range";
+import { SocketContext } from "../../lib/socket";
 
 const useLinkColor = (isActive: boolean) => {
   const primaryColor = useColorModeValue("gray.900", "gray.100");
@@ -30,15 +32,24 @@ const useLinkColor = (isActive: boolean) => {
 
 export const SideNavigation: VFC = () => {
   const router = useRouter();
-  
-  const [sliderValue, setSliderValue] = useState(5)
-  const [showTooltip, setShowTooltip] = useState(false)
+  const socket = useContext(SocketContext);
+  const [playlist, setPlaylist] = useState<{name:string, id:string, image:string} | undefined>(undefined);
 
   return (
     <Box h="full" w="80" bgColor={useColorModeValue(undefined, "gray.900")} p="5">
       <Text as="span" fontWeight="bold" fontSize={28}>
         Parameters
       </Text>
+      {/* Button to go to search */}
+      
+      <Button
+        mt="4"
+        onClick={() => router.push(pagesPath.search.$url())}
+        colorScheme="blue"
+        variant="outline"
+      >
+        Set the Playlist
+      </Button>
       
     </Box>
   );
@@ -109,3 +120,7 @@ const PlaylistLinksFallback: VFC = () => {
     </Stack>
   );
 };
+function useContext(SocketContext: any) {
+  throw new Error("Function not implemented.");
+}
+
