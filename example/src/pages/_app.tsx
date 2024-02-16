@@ -10,6 +10,7 @@ function MyApp(this: any, { Component, pageProps }: AppProps) {
   const [room, setRoom] = useState<any>({});
 
   const handleRoomUpdate = useCallback((newroom) => {
+    if(newroom?.version <= room?.version) return;
     setRoom(newroom);
     console.log("Room update: ", newroom);
   }, []);
