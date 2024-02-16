@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+const { distance } = require('fastest-levenshtein')
 
 const io = new Server({ /* options */ });
 
@@ -11,7 +12,7 @@ let rooms = {};
 // rooms[roomid].playlist.Id = "playlistid"
 // rooms[roomid].playlist.Name = "playlistname"
 // rooms[roomid].curentTrack.id = "songId"
-// romms[roomid].curentTrack.name = "songName"
+// rooms[roomid].curentTrack.name = "songName"
 // rooms[roomid].curentTrack.artist = "artistName"
 // rooms[roomid].score = {socketid1: 0, socketid2: 0, ...}
 // rooms[roomid].success = {socketid1: {name:true, artist:true}, socketid2: {name:true, artist:true}, ...}
@@ -142,8 +143,12 @@ io.on("connection", (socket) => {
 
     // JOIN ROOM [roomid]
     socket.on('JOIN_ROOM', (roomid) => {
-        // [ ] Tom | manage the case where the player is already in a room
+        // [x] Tom | manage the case where the player is already in a room
         console.log(`[JOIN_ROOM] ${roomid} by ${socket.id}`);
+        if (players[socket.id]) {
+            handleDisconnect(socket);
+        }
+
         if (!rooms[roomid]) {
             socket.emit('ERROR', 'Room not found');
             return;
@@ -214,6 +219,13 @@ io.on("connection", (socket) => {
             socket.emit('ERROR', 'You already tried this song');
             return;
         }
+        const {score, success} = test(s, rooms[roomid].success[socket.id], rooms[roomid].curentTrack.name, rooms[roomid].curentTrack.artist);
+        if (score === 0) {
+            socket.emit('ERROR', 'No match');
+            return;
+        }
+        rooms[roomid].score[socket.id] += score;
+        rooms[roomid].success[socket.id] = success;
         
         rooms[roomid].version += 1;
         rooms[roomid].score[socket.id] = 0;
@@ -224,30 +236,7 @@ io.on("connection", (socket) => {
 
     // LEAVE ROOM
     socket.on('disconnect', () => {
-        console.log(`[disconnect] ${socket.id}`);
-        if (!players[socket.id]) {
-            // socket.id is not in any room
-            return;
-        }
-        const roomid = players[socket.id];
-        delete players[socket.id];
-        
-        rooms[roomid].version += 1;
-        if (rooms[roomid].master === socket.id) {
-            // socket.id is the master of the room
-            rooms[roomid].players.forEach(player => {
-                if (player !== socket.id) {
-                    io.to(player).emit('ROOM_DESTROYED');
-                }
-                delete players[player];
-            });
-            delete rooms[roomid];
-        } else {
-            rooms[roomid].players = rooms[roomid].players.filter(player => player !== socket.id);
-            rooms[roomid].players.forEach(player => {
-                io.to(player).emit('PLAYER_LEFT', socket.id);
-            });
-        }
+        handleDisconnect(socket);
     });
 });
 
@@ -267,12 +256,43 @@ function makeid(length) {
 
 function test(s, success, name, artist) {
     let score = 0;
-    if (!(success.name === true)) {
+    if (!(success.name !== true)) {
         // [ ] Tom | implemente levenshtein distance
+        distance(s, name) < 3 ? score += 1 : score += 0;
+        success.name = true;
     }
-    if (!(success.artist === true)) {
+    if (!(success.artist !== true)) {
         // [ ] Tom | implemente levenshtein distance
+        distance(s, artist) < 3 ? score += 1 : score += 0;
+        success.artist = true;
     }
-
     return {score, success}
+}
+
+function handleDisconnect(socket) {
+    
+    console.log(`[disconnect] ${socket.id}`);
+    if (!players[socket.id]) {
+        // socket.id is not in any room
+        return;
+    }
+    const roomid = players[socket.id];
+    delete players[socket.id];
+    
+    rooms[roomid].version += 1;
+    if (rooms[roomid].master === socket.id) {
+        // socket.id is the master of the room
+        rooms[roomid].players.forEach(player => {
+            if (player !== socket.id) {
+                io.to(player).emit('ROOM_DESTROYED');
+            }
+            delete players[player];
+        });
+        delete rooms[roomid];
+    } else {
+        rooms[roomid].players = rooms[roomid].players.filter(player => player !== socket.id);
+        rooms[roomid].players.forEach(player => {
+            io.to(player).emit('PLAYER_LEFT', socket.id);
+        });
+    }
 }
