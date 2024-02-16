@@ -6,29 +6,42 @@ import { PageFallback } from "../shared/PageFallback";
 import { SocketContext } from "../../lib/socket";
 import { WithHeader } from "../shared/WithHeader";
 
-export const RoomPage: VFC<{ roomId: string }> = ({ roomId }) => {
+export const RoomPage: VFC<{ Id: string }> = ({ Id }) => {
+  //@ts-ignore
+  const {socket, room} = useContext(SocketContext);
+  // use the room id and if the user is the room master provided by the context
+  const [roomId, setRoomId] = useState<string | undefined>(undefined);
+  
+  if (typeof room?.id === "string") {
+    setRoomId(room.id);
+  }
+  
+  // try to join the room
+  useEffect(() => {
+    if (roomId === undefined) {
+      socket.emit("JOIN_ROOM", Id);
+    }
+  }, [socket]);
+
+  // [ ] Tom | Manage if the room is full or not available
   return (
     <ErrorBoundary>
       <Suspense fallback={<PageFallback />}>
-        <RoomPageContent roomIdAsked={roomId} />
+        { roomId !== undefined && (<RoomPageContent roomId={roomId} />)}
       </Suspense>
     </ErrorBoundary>
   );
 };
 
-export const RoomPageContent: VFC<{ roomIdAsked: string }> = ({ roomIdAsked }) => {
+export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
   //@ts-ignore
   const {socket, room} = useContext(SocketContext);
 
   // use the room id and if the user is the room master provided by the context
-  const [roomId, setRoomId] = useState<string | undefined>(undefined);
   const [isRoomMaster, setIsRoomMaster] = useState<boolean>(false);
   const [status, setStatus] = useState<string>("waiting");
 
   useEffect(() => {
-    if (typeof room?.id === "string") {
-      setRoomId(room.id);
-    }
     if (typeof room?.master === "string") {
       setIsRoomMaster(room?.master === socket.id);
     }
@@ -37,12 +50,6 @@ export const RoomPageContent: VFC<{ roomIdAsked: string }> = ({ roomIdAsked }) =
     }
   }, [room]);
   
-  // try to join the room
-  useEffect(() => {
-    if (roomId === undefined) {
-      socket.emit("JOIN_ROOM", roomIdAsked);
-    }
-  }, [socket]);
 
   // [ ] Syndelle | This is the page to access the room
   return (
@@ -78,11 +85,11 @@ export const RoomPageContent: VFC<{ roomIdAsked: string }> = ({ roomIdAsked }) =
         )}
         { // [ ] Tom | Manage next round
         status === "playing" && (
-
+          
         )}
         { // [ ] Tom | Restart the game
         status === "finished" && (
-          
+
         )}
         </Center>
         )}

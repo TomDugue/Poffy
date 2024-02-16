@@ -142,6 +142,7 @@ io.on("connection", (socket) => {
 
     // JOIN ROOM [roomid]
     socket.on('JOIN_ROOM', (roomid) => {
+        // [ ] Tom | manage the case where the player is already in a room
         console.log(`[JOIN_ROOM] ${roomid} by ${socket.id}`);
         if (!rooms[roomid]) {
             socket.emit('ERROR', 'Room not found');
