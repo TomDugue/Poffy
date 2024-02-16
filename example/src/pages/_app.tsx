@@ -14,16 +14,22 @@ function MyApp(this: any, { Component, pageProps }: AppProps) {
     setRoom(newroom);
     console.log("Room update: ", newroom);
   }, []);
+
+  const handleError = useCallback((error) => {
+    throw new Error(error);
+  }, []);
   
   useEffect(() => {
 
     // subscribe to socket events
     socket.on("ROOM_UPDATE", handleRoomUpdate); 
+    socket.on("ERROR", handleError);
 
     return () => {
       // before the component is destroyed
       // unbind all event handlers used in this component
       socket.off("ROOM_UPDATE", handleRoomUpdate);
+      socket.off("ERROR", handleError);
     };
   }, [handleRoomUpdate]);
 

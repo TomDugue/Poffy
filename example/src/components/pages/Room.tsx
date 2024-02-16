@@ -1,39 +1,55 @@
-import { Box, Heading, HStack, Stack, useColorModeValue, Text, Icon, Circle, Center, Button, Editable, EditableInput, EditablePreview, PinInput, PinInputField } from "@chakra-ui/react";
-import { memo, Suspense, VFC } from "react";
-import {
-  useFollowedArtists,
-  useFeaturedPlaylists,
-  useMyTopArtists,
-  useMyTopTracks,
-} from "../../hooks/spotify-api";
-import { range } from "../../lib/range";
-import { ArtistCard, ArtistCardSkeleton } from "../shared/ArtistCard";
+import { Box, Heading, HStack, useColorModeValue, Text, Center, Button, Editable, EditableInput, EditablePreview, PinInput, PinInputField } from "@chakra-ui/react";
+import { Suspense, useEffect, useState, VFC, useContext } from "react";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { Header } from "../shared/Header";
-import { HScrollable } from "../shared/HScrollable";
-import { Layout } from "../shared/Layout";
 import { PageFallback } from "../shared/PageFallback";
-import { PlaylistCard, PlaylistCardSkeleton } from "../shared/PlaylistCard";
-import { ResponsiveBottom } from "../shared/ResponsiveBottom";
-import { SideNavigation } from "../shared/SideNavigation";
-import { Track, TrackSkeleton } from "../shared/Track";
+import { SocketContext } from "../../lib/socket";
 import { WithHeader } from "../shared/WithHeader";
 
 export const RoomPage: VFC<{ roomId: string }> = ({ roomId }) => {
   return (
     <ErrorBoundary>
       <Suspense fallback={<PageFallback />}>
-        <RoomPageContent roomId={roomId} />
+        <RoomPageContent roomIdAsked={roomId} />
       </Suspense>
     </ErrorBoundary>
   );
 };
 
-export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
+export const RoomPageContent: VFC<{ roomIdAsked: string }> = ({ roomIdAsked }) => {
+  //@ts-ignore
+  const {socket, room} = useContext(SocketContext);
+
+  // use the room id and if the user is the room master provided by the context
+  const [roomId, setRoomId] = useState<string | undefined>(undefined);
+  const [isRoomMaster, setIsRoomMaster] = useState<boolean>(false);
+  const [status, setStatus] = useState<string>("waiting");
+
+  useEffect(() => {
+    if (typeof room?.id === "string") {
+      setRoomId(room.id);
+    }
+    if (typeof room?.master === "string") {
+      setIsRoomMaster(room?.master === socket.id);
+    }
+    if (typeof room?.status === "string") {
+      setStatus(room?.status);
+    }
+  }, [room]);
+  
+  // try to join the room
+  useEffect(() => {
+    if (roomId === undefined) {
+      socket.emit("JOIN_ROOM", roomIdAsked);
+    }
+  }, [socket]);
+
   // [ ] Syndelle | This is the page to access the room
   return (
     <WithHeader header={<Header bgColor={useColorModeValue("white", "gray.800")} />}>
         <Center inset={0}>
+          {// [ ] Noémie | Put in copyboard the link to the room
+          status === "waiting" && (
             <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
             <Box p={5} shadow='md'
                 borderRadius="lg"
@@ -44,7 +60,32 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
                 </Text>
             </Box>
             </HStack>
+          )}
+          {// [ ] Noémie | Display the input and send it to the server
+          status === "playing" && (
+            
+          )}
+          {// [ ] Noémie | Display the score
+          status === "finished" && (
+            
+          )}
         </Center>
+        {isRoomMaster && (
+        <Center inset={0}>
+        { // [ ] Tom | Manage start game
+        status === "waiting" && (
+          
+        )}
+        { // [ ] Tom | Manage next round
+        status === "playing" && (
+
+        )}
+        { // [ ] Tom | Restart the game
+        status === "finished" && (
+          
+        )}
+        </Center>
+        )}
     </WithHeader>
   );
 };

@@ -75,92 +75,16 @@ export const LargerController: VFC = () => {
       py="2"
       boxShadow="lg">
       <HStack width="30%" spacing="3">
-        {currentTrack && (
-          <>
-            <Image
-              src={currentTrack.album.images[0].url}
-              alt={currentTrack.album.name}
-              width="12"
-              height="12"
-            />
-            <Stack spacing="0">
-              <Text
-                as="div"
-                fontSize="sm"
-                fontWeight="bold"
-                noOfLines={1}
-                wordBreak="break-all">
-                {currentTrack.name}
-              </Text>
-              <SecondaryText as="div" fontSize="xs" noOfLines={1} wordBreak="break-all">
-                {currentTrack.artists[0].name}
-              </SecondaryText>
-            </Stack>
-            <IconButton
-              role="checkbox"
-              aria-label="toggle saved"
-              aria-checked={isSavedTrack}
-              size="sm"
-              icon={
-                <Icon as={isSavedTrack ? MdFavorite : MdFavoriteBorder} fontSize="xl" />
-              }
-              onClick={toggleIsSavedTrack}
-              variant="ghost"
-              color={isSavedTrack ? "green.600" : undefined}
-            />
-          </>
-        )}
       </HStack>
       <Box width="40%">
         <VStack>
           <HStack>
-            <IconButton
-              role="checkbox"
-              aria-label="toggle shuffle"
-              aria-checked={shuffleState ?? "mixed"}
-              isDisabled={!playerIsActive}
-              variant="ghost"
-              size="sm"
-              color={shuffleState ? "green.600" : undefined}
-              icon={<Icon fontSize="xl" as={MdShuffle} />}
-              onClick={toggleShuffleState}
-            />
-            <IconButton
-              aria-label="skip previous"
-              isDisabled={!playerIsActive}
-              size="sm"
-              icon={<Icon as={MdSkipPrevious} fontSize="2xl" />}
-              onClick={skipToPrevious}
-              variant="ghost"
-            />
             <IconButton
               aria-label="toggle play"
               isDisabled={!playerIsActive}
               icon={<Icon as={isPlaying ? MdPause : MdPlayArrow} fontSize="3xl" />}
               onClick={togglePlay}
               variant="ghost"
-            />
-            <IconButton
-              aria-label="skip next"
-              isDisabled={!playerIsActive}
-              size="sm"
-              icon={<Icon as={MdSkipNext} fontSize="2xl" />}
-              onClick={skipToNext}
-              variant="ghost"
-            />
-            <IconButton
-              aria-label="change repeat mode"
-              isDisabled={!playerIsActive}
-              variant="ghost"
-              size="sm"
-              color={repeatMode !== "off" ? "green.600" : undefined}
-              icon={
-                <Icon
-                  fontSize="xl"
-                  as={repeatMode === "track" ? MdRepeatOne : MdRepeat}
-                />
-              }
-              onClick={changeRepeatMode}
             />
           </HStack>
           <WithPlaybackState
