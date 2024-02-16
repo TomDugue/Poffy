@@ -74,8 +74,6 @@ const CreateRoom: VFC = memo(() => {
 const JoinRoom: VFC = memo(() => {
   // [ ] Syndelle | Complete JoinRoom component
   // [x] Tom | Add a text input to enter the room id
-  // [ ] Tom | Verify if the room exists
-  // [ ] Tom | If the room exists, redirect to /room/[roomId]
   const [roomid, setRoomId] = useState("000000");
   return (
     <Box p={5} shadow='md'

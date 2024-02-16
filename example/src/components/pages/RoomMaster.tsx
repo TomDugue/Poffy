@@ -10,7 +10,7 @@ import { SocketContext } from "../../lib/socket";
 export const RoomMasterPage: VFC = () => {
   //@ts-ignore
   const {socket, room} = useContext(SocketContext);
-  // [X] Tom | Create a room
+  // [x] Tom | Create a room
   // [ ] Tom | Detect if the user is already in a room
 
   const [roomId, setRoomId] = useState<string | undefined>(undefined);

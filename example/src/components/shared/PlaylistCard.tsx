@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 export const PlaylistCard: VFC<{ playlist: SpotifyApi.PlaylistBaseObject }> = ({
   playlist,
 }) => {
+  //@ts-ignore
   const {socket, room} = useContext(SocketContext);
   const router = useRouter();
   
@@ -25,7 +26,7 @@ export const PlaylistCard: VFC<{ playlist: SpotifyApi.PlaylistBaseObject }> = ({
       borderRadius="lg"
       p="6"
       bgColor={useColorModeValue("gray.100", "gray.700")}
-      // [ ] Tom | Add onClick event to set the playlist to the room
+      // [x] Tom | Add onClick event to set the playlist to the room
       onClick={setPlaylist}
       _hover={{ bgColor: useColorModeValue("gray.200", "gray.600") }}>
       <Box height="32" width="32">
