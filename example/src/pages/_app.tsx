@@ -1,4 +1,4 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, useToast } from "@chakra-ui/react";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { chakraTheme } from "../common/chakra-theme";
@@ -16,7 +16,14 @@ function MyApp(this: any, { Component, pageProps }: AppProps) {
   }, []);
 
   const handleError = useCallback((error) => {
-    throw new Error(error);
+    const toast = useToast()
+    toast({
+      title: 'Nope !',
+      description: error,
+      status: 'error',
+      duration: 2500,
+      isClosable: true,
+    })
   }, []);
   
   useEffect(() => {
