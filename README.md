@@ -1,5 +1,5 @@
-# Title
-POFFY
+# POFFY
+Welcome to this project
 
 # Description
 Online Blindtest using Spotify API
@@ -7,10 +7,10 @@ Play with your friends and Family and try to guess the current song playing !
 Create or Join a private room to play, share the code to your team, select a playlist and you're ready to go.
 
 # Team
-- Dugué Tom             Back-End (server & Api connexion)
-- Airaud Syndelle       Front-End
-- Papin Noémie          Full stack
-- Raimbault Alexandre   Full stack
+- Dugué Tom             *(Back-End (server & Api connexion))*
+- Airaud Syndelle       *(Front-End)*
+- Papin Noémie          *(Full stack)*
+- Raimbault Alexandre   *(Full stack)*
 
 # Technologies
 Node.js
@@ -20,7 +20,7 @@ Spotify API
 Socket.io
 
 # Link to play :
--Soon
+- Soon
 
 # Bugs
 - To complete
