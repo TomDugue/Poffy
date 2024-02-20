@@ -37,12 +37,12 @@ export const SideNavigation: VFC = () => {
     if (typeof room?.playlist?.id === "string"
       && typeof room?.playlist?.name === "string"
       && typeof room?.playlist?.image === "string") {
-        // @ts-ignore
-        setPlaylist({
-          id:room.playlist.id,
-          name:room.playlist.name,
-          image:room.playlist.image
-        });
+      // @ts-ignore
+      setPlaylist({
+        id:room.playlist.id,
+        name:room.playlist.name,
+        image:room.playlist.image
+      });
     }
   }, [room]);
 
@@ -155,3 +155,36 @@ const PlaylistLinksFallback: VFC = () => {
     </Stack>
   );
 };
+
+// [ ] Tom | Please make this component
+const Playlist: VFC = () => {
+  const router = useRouter();
+  const playlistId = router.query.playlistId as string;
+
+  return (
+    <Stack
+          borderRadius="lg"
+          p="6"
+          bgColor={useColorModeValue("gray.100", "gray.700")}>
+          <Box height="32" width="32">
+            <Image
+              height="32"
+              width="32"
+              src={playlist.image}
+              alt={playlist.name}
+              borderRadius="xl"
+            />
+          </Box>
+          <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
+            {playlist.name}
+          </Text>
+          <Button
+            mt="4"
+            onClick={() => router.push(pagesPath.search.$url())}
+            colorScheme="blue"
+            variant="outline">
+            Change the playlist
+          </Button>
+        </Stack>
+  );
+}

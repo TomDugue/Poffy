@@ -120,6 +120,7 @@ io.on("connection", (socket) => {
             socket.emit('ERROR', 'You are not the master of this room');
             return;
         }
+        console.log(`[NEXT_ROUND] 2 ${roomid}`);
         rooms[roomid].version += 1;
         rooms[roomid].round += 1;
         rooms[roomid].status = "playing";

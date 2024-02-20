@@ -5,6 +5,10 @@ import { Header } from "../shared/Header";
 import { PageFallback } from "../shared/PageFallback";
 import { SocketContext } from "../../lib/socket";
 import { WithHeader } from "../shared/WithHeader";
+import { useIsomorphicCurrentTrack } from "../../hooks/useIsomorphicCurrentTrack";
+import { usePlayerController } from "../../hooks/usePlayerController";
+import { usePlaylist } from "../../hooks/spotify-api";
+import { usePlayContextURI } from "../../hooks/usePlayContextURI";
 
 export const RoomPage: VFC<{ Id: string }> = ({ Id }) => {
   //@ts-ignore
@@ -49,21 +53,35 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
       setStatus(room?.status);
     }
   }, [room]);
+  
+  const {
+    playerIsActive,
+    isPlaying,
+    togglePlay,
+    skipToNext,
+    skipToPrevious,
+    repeatMode,
+    changeRepeatMode,
+    shuffleState,
+    toggleShuffleState,
+  } = usePlayerController();
+  
+  // const { data: playlist } = usePlaylist([room.playlist.id]);
+  // const { isPlayingContextURI, togglePlayContextURI } = usePlayContextURI(
+  //   playlist?.uri ?? "",
+  // );
+  
+  // const currentTrack = useIsomorphicCurrentTrack();
 
-  const setAnswer = () => {
-    // Check if the answer is not empty before sending it to the server
-    if (answer.trim() === "") {
-      // Handle empty answer case, you may want to display an error message
-      console.error("Answer cannot be empty");
-      return;
-    }
+  const handleStartGame = () => {
+    // [ ] Tom | Manage start game
+    // togglePlayContextURI();
 
-    // Send the answer to the server
-    socket.emit("TRY_SONG", { answer });
-
-    // redirect to the room page
-    router.push(pagesPath.master.$url());
-  };
+    // if (shuffleState !== true) toggleShuffleState();
+    
+    // currentTrack?.album?.images[0].url
+    // socket.emit("NEXT_ROUND", {...room, currentTrack:{id:currentTrack?.id, name:currentTrack?.name, artist:currentTrack?.artists}})
+  }
   
 
   // [ ] Syndelle | This is the page to access the room
@@ -89,9 +107,13 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
             <Input
               placeholder='Enter the title or the singer'
               size='lg'
-              value={answer}
+              value=""
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  socket.emit("TRY_SONG", e.currentTarget.value );
+                }
+              }}
             />
-            <Button onClick={setAnswer}>Submit Answer</Button>
           </Stack>
             
           )}
@@ -110,52 +132,6 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
             
           )}
         </Center>
-        {isRoomMaster && (
-        <Center inset={0}>
-        { // [ ] Tom | Manage start game
-        status === "waiting" && ( //truc en attente pour ne pas faire beug
-          <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
-          <Box p={5} shadow='md'
-              borderRadius="lg"
-              bgColor={useColorModeValue("gray.100", "gray.700")}>
-              <Heading fontSize='xl'>Room {roomId}</Heading>
-              <Text mt={4}>
-              This is the room {roomId}. You can invite your friends to join you.
-              </Text>
-          </Box>
-          </HStack>
-          
-        )}
-        { // [ ] Tom | Manage next round
-        status === "playing" && ( //truc en attente pour ne pas faire beug
-          <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
-          <Box p={5} shadow='md'
-              borderRadius="lg"
-              bgColor={useColorModeValue("gray.100", "gray.700")}>
-              <Heading fontSize='xl'>Room {roomId}</Heading>
-              <Text mt={4}>
-              This is the room {roomId}. You can invite your friends to join you.
-              </Text>
-          </Box>
-          </HStack>
-          
-        )}
-        { // [ ] Tom | Restart the game
-        status === "finished" && ( //truc en attente pour ne pas faire beug
-          <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
-          <Box p={5} shadow='md'
-              borderRadius="lg"
-              bgColor={useColorModeValue("gray.100", "gray.700")}>
-              <Heading fontSize='xl'>Room {roomId}</Heading>
-              <Text mt={4}>
-              This is the room {roomId}. You can invite your friends to join you.
-              </Text>
-          </Box>
-          </HStack>
-
-        )}
-        </Center>
-        )}
     </WithHeader>
   );
 };

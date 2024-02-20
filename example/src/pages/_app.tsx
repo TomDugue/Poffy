@@ -15,8 +15,8 @@ function MyApp(this: any, { Component, pageProps }: AppProps) {
     console.log("Room update: ", newroom);
   }, []);
 
+  const toast = useToast()
   const handleError = useCallback((error) => {
-    const toast = useToast()
     toast({
       title: 'Nope !',
       description: error,
