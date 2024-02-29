@@ -118,18 +118,15 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
             
           )}
           {// [ ] Noémie | Display the score
-          status === "finished" && ( //truc en attente pour ne pas faire beug
+          status === "finished" && ( //voir pour la déclaration de scoreValue
             <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
-            <Box p={5} shadow='md'
-                borderRadius="lg"
-                bgColor={useColorModeValue("gray.100", "gray.700")}>
-                <Heading fontSize='xl'>Room {roomId}</Heading>
-                <Text mt={4}>
-                This is the room {roomId}. You can invite your friends to join you.
-                </Text>
+            <Box p={5} shadow='md'>
+              <Box mt={4}>
+                <Text fontWeight="bold">Score:</Text>
+                <Text>{scoreValue}</Text>
+              </Box>
             </Box>
             </HStack>
-            
           )}
         </Center>
     </WithHeader>
