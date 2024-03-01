@@ -1,5 +1,5 @@
 {
     "typescript.enablePromptUseWorkspaceTsdk": true,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "example/node_modules/typescript/lib"
   }
   

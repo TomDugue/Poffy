@@ -1,14 +1,14 @@
 import { Box, Image, Skeleton, Stack, Text, useColorModeValue } from "@chakra-ui/react";
 import { VFC, useContext } from "react";
-import { SocketContext } from "../../lib/socket";
+import { useRoom, useSocket } from "../../hooks/room";
 import { pagesPath } from "../../lib/$path";
 import { useRouter } from "next/router";
 
 export const PlaylistCard: VFC<{ playlist: SpotifyApi.PlaylistBaseObject }> = ({
   playlist,
 }) => {
-  //@ts-ignore
-  const {socket, room} = useContext(SocketContext);
+  const socket = useSocket();
+  const room = useRoom();
   const router = useRouter();
   
   const setPlaylist = () =>{

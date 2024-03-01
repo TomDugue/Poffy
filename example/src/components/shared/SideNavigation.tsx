@@ -14,11 +14,10 @@ import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useContext, useEffect, useState, VFC } from "react";
 import { IconType } from "react-icons";
-import { useUserPlaylists } from "../../hooks/spotify-api";
+import { useRoom, useSocket } from "../../hooks/room";
+import { usePlaylist, useUserPlaylists } from "../../hooks/spotify-api";
 import { useSecondaryTextColor } from "../../hooks/useSecondaryTextColor";
 import { pagesPath } from "../../lib/$path";
-import { range } from "../../lib/range";
-import { SocketContext } from "../../lib/socket";
 
 const useLinkColor = (isActive: boolean) => {
   const primaryColor = useColorModeValue("gray.900", "gray.100");
@@ -28,8 +27,7 @@ const useLinkColor = (isActive: boolean) => {
 
 export const SideNavigation: VFC = () => {
   const router = useRouter();
-  //@ts-ignore
-  const {socket, room} = useContext(SocketContext);
+  const room = useRoom();
   
   const [playlist, setPlaylist] = useState<{id:string, name:string, image:string} | undefined>(undefined);
 
@@ -37,7 +35,6 @@ export const SideNavigation: VFC = () => {
     if (typeof room?.playlist?.id === "string"
       && typeof room?.playlist?.name === "string"
       && typeof room?.playlist?.image === "string") {
-      // @ts-ignore
       setPlaylist({
         id:room.playlist.id,
         name:room.playlist.name,
@@ -93,18 +90,35 @@ const PlaylistLink: VFC<{
 // [ ] Tom | Please make this component
 const Playlist: VFC<{ playlist: {id:string, name:string, image:string} }> = ({ playlist }) => {
   const router = useRouter();
-  //@ts-ignore
-  const {socket, room} = useContext(SocketContext);
+  const socket = useSocket();
+  const room = useRoom();
 
   const [status, setStatus] = useState<string>("waiting");
+  
+  const { data: playlistdata } = usePlaylist([room.playlist.id]);
 
   const handleGameStart = () => {
-
-    socket.emit("NEXT_ROUND", room);
+    if (playlistdata === undefined) {
+      throw new Error("The playlist data is not loaded yet.");
+    }
+    const rounds = playlistdata.tracks.items
+      .filter((playlistTrack) => playlistTrack.track.type === "track")
+      .map((playlistTrack) => {
+        const track = (playlistTrack.track as SpotifyApi.TrackObjectFull);
+        return {uri:track.uri, name:track.name, artist:track.artists[0].name}
+      })
+      // [ ] Tom | Find a better way to shuffle the array @see: https://dev.to/codebubb/how-to-shuffle-an-array-in-javascript-2ikj
+      .sort(() => Math.random() - 0.5)
+      .slice(0, room.roundsNumber);
+    if (rounds.length !== room.roundsNumber) {
+      throw new Error(`Their is only ${room.rounds.length} tracks in the playlist, you can't play ${room.roundsNumber} rounds.`);
+    }
+    socket.emit("UPDATE_PARAMETERS", {rounds: rounds});
+    handleNextRound();
   }
 
   const handleNextRound = () => {
-    socket.emit("NEXT_ROUND", room);
+    socket.emit("NEXT_ROUND");
   }
 
   useEffect(() => {

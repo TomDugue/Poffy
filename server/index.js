@@ -242,10 +242,6 @@ io.on("connection", (socket) => {
             socket.emit('ERROR', 'No song is playing');
             return;
         }
-        if (rooms[roomid].score[socket.id] !== undefined) {
-            socket.emit('ERROR', 'You already tried this song');
-            return;
-        }
         const {score, success} = test(s, rooms[roomid].success[socket.id], rooms[roomid].rounds[rooms[roomid].roundNumber].name, rooms[roomid].rounds[rooms[roomid].roundNumber].artist);
         if (score === 0) {
             socket.emit('ERROR', 'No match');
@@ -255,7 +251,6 @@ io.on("connection", (socket) => {
         rooms[roomid].success[socket.id] = success;
         
         rooms[roomid].version += 1;
-        rooms[roomid].score[socket.id] = 0;
         rooms[roomid].players.forEach(player => {
             io.to(player.id).emit('ROOM_UPDATE', rooms[roomid]);
         });
@@ -281,20 +276,24 @@ function makeid(length) {
     return result;
 }
 
+// [ ] Tom | Implement the distance function
+// convert all text to upercase, remove all special characters
 function test(s, success, name, artist) {
     let score = 0;
     if (success === undefined) {
         success = {name: false, artist: false};
     }
-    if (!(success.name !== true)) {
-        // [x] Tom | implemente levenshtein distance
-        distance(s, name) < 3 ? score += 1 : score += 0;
-        success.name = true;
+    if (success.name !== true) {
+        if(distance(s, name) <= name.length*0.25) {
+            score += 1;
+            success.artist = true;
+        }
     }
-    if (!(success.artist !== true)) {
-        // [x] Tom | implemente levenshtein distance
-        distance(s, artist) < 3 ? score += 1 : score += 0;
-        success.artist = true;
+    if (success.artist !== true) {
+        if(distance(s, artist) <= artist.length*0.25) {
+            score += 1;
+            success.artist = true;
+        }
     }
     return {score, success}
 }

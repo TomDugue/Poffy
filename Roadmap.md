@@ -3,17 +3,17 @@
  - Se connecter à spoty - `Tom`(OK)
  - Ecouter une musique - `Tom` (OK)
  ## 0.2
- - Ecouter une liste de musique prédéfini (tirer aléatoirement) `Tom` (en cours)
+ - Ecouter une liste de musique prédéfini (tirer aléatoirement) `Tom` (OK)
  - Tester le titre de la chanson (en cours)
- - Passer la chanson d'après `Tom` (en cours)
+ - Passer la chanson d'après `Tom` (OK)
  ## 0.3
- - Tester le titre/ l'auteur - `Noémie` (en cours)
- - scorbord pendant et à la fin (en cours)
+ - Tester le titre/ l'auteur `Noémie` (en cours)
+ - scorbord pendant et à la fin `Noémie` (en cours)
 # Version 1
 ## 1.0
- - Créer un system de loby - (OK)
- - se connecter avec un Tag ou créer un nouveau - (OK)
- - choisir le nombre de chanson - (En cours)
+ - Créer un system de loby (OK)
+ - se connecter avec un Tag ou créer un nouveau (OK)
+ - choisir le nombre de chanson (En cours)
 ## 1.1
  - Systeme de gestion des loby
    - suppression si innactif
@@ -25,9 +25,22 @@
  - temps limité pour trouvé (paramétrable)
 ## 1.4
  - Choisir la liste pour la partie :
-    - playlist
+    - playlist (OK)
     - top du moment
     - thématique
 # Version 2
 ## 2.0
  - Afficher la vidéo du clip
+
+
+
+ RESTE A FAIRE :
+ - score board
+ - afficher le titre de la chanson a la fin
+ - afficher si trouvé ou non
+ - afficher le temps
+ - afficher les joueurs avec leur score
+ - ajouter les autres paramètres (temps, nombre de chanson, etc...)
+ - modifier le nom des joueurs
+ - arreter la musique à la fin
+ - enlever le fait de pouvoir play/pause et changer le temps de la musique
