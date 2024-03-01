@@ -61,66 +61,9 @@ export const SideNavigation: VFC = () => {
           Set the Playlist
         </Button>
       ) : (
-        <Stack
-          borderRadius="lg"
-          p="6"
-          bgColor={useColorModeValue("gray.100", "gray.700")}>
-          <Box height="32" width="32">
-            <Image
-              height="32"
-              width="32"
-              src={playlist.image}
-              alt={playlist.name}
-              borderRadius="xl"
-            />
-          </Box>
-          <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
-            {playlist.name}
-          </Text>
-          <Button
-            mt="4"
-            onClick={() => router.push(pagesPath.search.$url())}
-            colorScheme="blue"
-            variant="outline">
-            Change the playlist
-          </Button>
-        </Stack>
+        <Playlist playlist={playlist}/>
       )}
     </Box>
-  );
-};
-
-const NavigationLink: VFC<{
-  icon: IconType;
-  isActive: boolean;
-  href: NextLinkProps["href"];
-  label: string;
-}> = ({ href, isActive, icon, label }) => {
-  return (
-    <NextLink href={href} passHref>
-      <HStack
-        as="a"
-        color={useLinkColor(isActive)}
-        transition="color 0.2s ease"
-        _hover={{ color: useColorModeValue("gray.900", "gray.100") }}>
-        <Icon as={icon} fontSize="3xl" />
-        <Text as="span" fontWeight={isActive ? "bold" : undefined}>
-          {label}
-        </Text>
-      </HStack>
-    </NextLink>
-  );
-};
-
-const PlaylistLinks: VFC = () => {
-  const { data: playlists } = useUserPlaylists([]);
-
-  return (
-    <Stack>
-      {playlists?.items.map((playlist) => (
-        <PlaylistLink key={playlist.id} playlist={playlist} />
-      ))}
-    </Stack>
   );
 };
 
@@ -146,45 +89,76 @@ const PlaylistLink: VFC<{
   );
 };
 
-const PlaylistLinksFallback: VFC = () => {
-  return (
-    <Stack spacing="4">
-      {[...range(0, 5)].map((i) => (
-        <SkeletonText key={i} noOfLines={1} />
-      ))}
-    </Stack>
-  );
-};
 
 // [ ] Tom | Please make this component
-const Playlist: VFC = () => {
+const Playlist: VFC<{ playlist: {id:string, name:string, image:string} }> = ({ playlist }) => {
   const router = useRouter();
-  const playlistId = router.query.playlistId as string;
+  //@ts-ignore
+  const {socket, room} = useContext(SocketContext);
+
+  const [status, setStatus] = useState<string>("waiting");
+
+  const handleGameStart = () => {
+
+    socket.emit("NEXT_ROUND", room);
+  }
+
+  const handleNextRound = () => {
+    socket.emit("NEXT_ROUND", room);
+  }
+
+  useEffect(() => {
+    if (typeof room?.status === "string") {
+      setStatus(room?.status);
+    }
+  }, [room]);
 
   return (
-    <Stack
-          borderRadius="lg"
-          p="6"
-          bgColor={useColorModeValue("gray.100", "gray.700")}>
-          <Box height="32" width="32">
-            <Image
-              height="32"
-              width="32"
-              src={playlist.image}
-              alt={playlist.name}
-              borderRadius="xl"
-            />
-          </Box>
-          <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
-            {playlist.name}
-          </Text>
-          <Button
-            mt="4"
-            onClick={() => router.push(pagesPath.search.$url())}
-            colorScheme="blue"
-            variant="outline">
-            Change the playlist
-          </Button>
-        </Stack>
+    <>
+      <Stack
+        borderRadius="lg"
+        p="6"
+        bgColor={useColorModeValue("gray.100", "gray.700")}>
+        <Box height="32" width="32">
+          <Image
+            height="32"
+            width="32"
+            src={playlist.image}
+            alt={playlist.name}
+            borderRadius="xl"
+          />
+        </Box>
+        <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
+          {playlist.name}
+        </Text>
+      </Stack>
+      <Button
+        mt="4"
+        onClick={() => {if(status === "waiting") router.push(pagesPath.search.$url())}}
+        disabled={status !== "waiting"}
+        colorScheme="blue"
+        variant="outline">
+        Change the playlist
+      </Button>
+      
+      {status === "waiting" && (
+      <Button
+        mt="4"
+        onClick={handleGameStart}
+        colorScheme="blue"
+        variant="outline">
+        Start the game
+      </Button>
+      )}
+      {status === "playing" && (
+      <Button
+        mt="4"
+        onClick={handleNextRound}
+        colorScheme="blue"
+        variant="outline">
+        Next round
+      </Button>
+      )}
+    </>
   );
 }

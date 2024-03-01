@@ -42,15 +42,19 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
   const {socket, room} = useContext(SocketContext);
 
   // use the room id and if the user is the room master provided by the context
-  const [isRoomMaster, setIsRoomMaster] = useState<boolean>(false);
   const [status, setStatus] = useState<string>("waiting");
+  const [round, setRound] = useState<number>(0);
+  const [rounds, setRounds] = useState<number>(5);
 
   useEffect(() => {
-    if (typeof room?.master === "string") {
-      setIsRoomMaster(room?.master === socket.id);
-    }
     if (typeof room?.status === "string") {
       setStatus(room?.status);
+    }
+    if (typeof room?.round === "number") {
+      setRound(room?.round);
+    }
+    if (typeof room?.rounds === "number") {
+      setRounds(room?.rounds);
     }
   }, [room]);
   
@@ -81,7 +85,7 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
     
     // currentTrack?.album?.images[0].url
     // socket.emit("NEXT_ROUND", {...room, currentTrack:{id:currentTrack?.id, name:currentTrack?.name, artist:currentTrack?.artists}})
-  }
+  } 
   
 
   // [ ] Syndelle | This is the page to access the room
@@ -91,45 +95,43 @@ export const RoomPageContent: VFC<{ roomId: string }> = ({ roomId }) => {
           {// [ ] Noémie | Put in copyboard the link to the room
           status === "waiting" && (
             <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
-            <Box p={5} shadow='md'
-                borderRadius="lg"
-                bgColor={useColorModeValue("gray.100", "gray.700")}>
-                <Heading fontSize='xl'>Room {roomId}</Heading>
-                <Text mt={4}>
-                This is the room {roomId}. You can invite your friends to join you.
-                </Text>
-            </Box>
+              <Box p={5} shadow='md'
+                  borderRadius="lg"
+                  bgColor={useColorModeValue("gray.100", "gray.700")}>
+                  <Heading fontSize='xl'>Room {roomId}</Heading>
+                  <Text mt={4}>
+                    This is the room {roomId}. You can invite your friends to join you.
+                  </Text>
+              </Box>
             </HStack>
           )}
           {// [ ] Noémie | Display the input and send it to the server
           status === "playing" && (
-            <Stack>
-            <Input
-              placeholder='Enter the title or the singer'
-              size='lg'
-              value=""
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  socket.emit("TRY_SONG", e.currentTarget.value );
-                }
-              }}
-            />
-          </Stack>
-            
+            <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
+              <Input
+                placeholder='Enter the title or the singer'
+                size='lg'
+                value=""
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    socket.emit("TRY_SONG", e.currentTarget.value );
+                  }
+                }}
+              />
+            </HStack>
           )}
           {// [ ] Noémie | Display the score
           status === "finished" && ( //truc en attente pour ne pas faire beug
             <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
-            <Box p={5} shadow='md'
-                borderRadius="lg"
-                bgColor={useColorModeValue("gray.100", "gray.700")}>
-                <Heading fontSize='xl'>Room {roomId}</Heading>
-                <Text mt={4}>
-                This is the room {roomId}. You can invite your friends to join you.
-                </Text>
-            </Box>
+              <Box p={5} shadow='md'
+                  borderRadius="lg"
+                  bgColor={useColorModeValue("gray.100", "gray.700")}>
+                  <Heading fontSize='xl'>Room {roomId}</Heading>
+                  <Text mt={4}>
+                    This is the room {roomId}. You can invite your friends to join you.
+                  </Text>
+              </Box>
             </HStack>
-            
           )}
         </Center>
     </WithHeader>

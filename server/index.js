@@ -104,7 +104,7 @@ io.on("connection", (socket) => {
     
         // Send update to all players
         rooms[roomid].players.forEach(player => {
-            io.to(player).emit('ROOM_UPDATE', rooms[roomid]);
+            io.to(player.id).emit('ROOM_UPDATE', rooms[roomid]);
         });
     });
 
@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
             return;
         }
         const roomid = players[socket.id];
-        console.log(`[NEXT_ROUND] ${roomid}`);
+        console.log(`[NEXT_ROUND] ${roomid} by ${socket.id}`);
         if (rooms[roomid].master !== socket.id) {
             socket.emit('ERROR', 'You are not the master of this room');
             return;
@@ -125,10 +125,11 @@ io.on("connection", (socket) => {
         rooms[roomid].round += 1;
         rooms[roomid].status = "playing";
         rooms[roomid].success = {};
+
         if (rooms[roomid].round > rooms[roomid].rounds) {
             rooms[roomid].status = "finished";
             rooms[roomid].players.forEach(player => {
-                io.to(player).emit('GAME_OVER', rooms[roomid]);
+                io.to(player.id).emit('GAME_OVER', rooms[roomid]);
             });
             return;
         }
@@ -138,8 +139,11 @@ io.on("connection", (socket) => {
             artist: room.curentTrack.artist
         };
         rooms[roomid].players.forEach(player => {
-            io.to(player).emit('ROUND_START', rooms[roomid]);
-        });
+            io.to(player.id).emit('ROUND_START', rooms[roomid]);
+            console.log(`[NEXT_ROUND] 1 ${roomid} to ${player}`);
+        });0
+        console.log(`[NEXT_ROUND] 3 ${roomid}`);
+        return;
     });
 
     // JOIN ROOM [roomid]
@@ -169,7 +173,7 @@ io.on("connection", (socket) => {
         rooms[roomid].players.push(socket.id);
         players[socket.id] = roomid;
         rooms[roomid].players.forEach(player => {
-            io.to(player).emit('PLAYER_JOIN', socket.id);
+            io.to(player.id).emit('PLAYER_JOIN', socket.id);
         });
     });
 
@@ -185,7 +189,7 @@ io.on("connection", (socket) => {
         console.log(`[CHANGE_NAME] ${socket.id} to ${name}`);
         rooms[roomid].name[socket.id] = name;
         rooms[roomid].players.forEach(player => {
-            io.to(player).emit('ROOM_UPDATE', rooms[roomid]);
+            io.to(player.id).emit('ROOM_UPDATE', rooms[roomid]);
         });
     });
 
@@ -212,7 +216,7 @@ io.on("connection", (socket) => {
             socket.emit('ERROR', 'Room is not available');
             return;
         }
-        if (rooms[roomid].currentSong.id === null) {
+        if (rooms[roomid].currentTrack.id === null) {
             socket.emit('ERROR', 'No song is playing');
             return;
         }
@@ -231,7 +235,7 @@ io.on("connection", (socket) => {
         rooms[roomid].version += 1;
         rooms[roomid].score[socket.id] = 0;
         rooms[roomid].players.forEach(player => {
-            io.to(player).emit('ROOM_UPDATE', rooms[roomid]);
+            io.to(player.id).emit('ROOM_UPDATE', rooms[roomid]);
         });
     });
 
@@ -285,7 +289,7 @@ function handleDisconnect(socket) {
         // socket.id is the master of the room
         rooms[roomid].players.forEach(player => {
             if (player !== socket.id) {
-                io.to(player).emit('ROOM_DESTROYED');
+                io.to(player.id).emit('ROOM_DESTROYED');
             }
             delete players[player];
         });
@@ -293,7 +297,7 @@ function handleDisconnect(socket) {
     } else {
         rooms[roomid].players = rooms[roomid].players.filter(player => player !== socket.id);
         rooms[roomid].players.forEach(player => {
-            io.to(player).emit('PLAYER_LEFT', socket.id);
+            io.to(player.id).emit('PLAYER_LEFT', socket.id);
         });
     }
 }

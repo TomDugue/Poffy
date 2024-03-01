@@ -10,9 +10,15 @@ function MyApp(this: any, { Component, pageProps }: AppProps) {
   const [room, setRoom] = useState<any>({});
 
   const handleRoomUpdate = useCallback((newroom) => {
+    console.log("Room update");
     if(newroom?.version <= room?.version) return;
     setRoom(newroom);
     console.log("Room update: ", newroom);
+  }, []);
+
+  const handleRoundStart = useCallback((newroom) => {
+    console.log("Round Start");
+    handleRoomUpdate((newroom))
   }, []);
 
   const toast = useToast()
@@ -29,13 +35,15 @@ function MyApp(this: any, { Component, pageProps }: AppProps) {
   useEffect(() => {
 
     // subscribe to socket events
-    socket.on("ROOM_UPDATE", handleRoomUpdate); 
+    socket.on("ROOM_UPDATE", handleRoomUpdate);
+    socket.on("ROUND_START", handleRoundStart);
     socket.on("ERROR", handleError);
 
     return () => {
       // before the component is destroyed
       // unbind all event handlers used in this component
       socket.off("ROOM_UPDATE", handleRoomUpdate);
+      socket.off("ROUND_START", handleRoundStart);
       socket.off("ERROR", handleError);
     };
   }, [handleRoomUpdate]);
