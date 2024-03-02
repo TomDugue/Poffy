@@ -1,4 +1,4 @@
-import { Box, Heading, HStack,Input, useColorModeValue, Text, Center, Grid, Stack } from "@chakra-ui/react";
+import { Box, Heading, HStack,Input, useColorModeValue, Text, Center, Grid, Stack, Progress } from "@chakra-ui/react";
 import { Suspense, useEffect, useState, VFC } from "react";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { Header } from "../shared/Header";
@@ -7,6 +7,8 @@ import { WithHeader } from "../shared/WithHeader";
 import { useSocket, useRoom } from "../../hooks/room";
 import { PlayerPanel } from "../shared/PlayerPanel";
 import { useIsMobileSize } from "../../hooks/useIsMobileSize";
+import { WithPlaybackState } from "../shared/WithPlaybackState";
+import { formatDurationMS } from "../../lib/formatDurationMS";
 
 export const RoomPage: VFC<{ Id: string }> = ({ Id }) => {
   const socket = useSocket();
@@ -125,6 +127,19 @@ const RoomPlayeGround: VFC = () => {
                     socket.emit("TRY_SONG", e.currentTarget.value );
                   }
                 }}
+              />
+              <WithPlaybackState
+                render={(state) => (
+                  <HStack w="full">
+                    <Text as="span" fontSize="xs">
+                      {formatDurationMS(state?.position ?? 0)}
+                    </Text>
+                    <Progress w={250} value={state?.position ?? 0} max={state?.duration ?? 0} />
+                    <Text as="span" fontSize="xs">
+                      {formatDurationMS(state?.duration ?? 0)}
+                    </Text>
+                  </HStack>
+                )}
               />
               {/*Show if the artist or the title is correct*/}
               <Box p={5} shadow='md'

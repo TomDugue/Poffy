@@ -17,6 +17,7 @@ export const PlayerPanel: VFC = () => {
   
     const [players, setPlayers] = useState<any[]>([]);
     const [masterId, setMasterId] = useState<string>('');
+    const [status, setStatus] = useState<string>("waiting");
   
     useEffect(() => {
         if (typeof room?.master === "string") {
@@ -24,6 +25,9 @@ export const PlayerPanel: VFC = () => {
         }
         if (Array.isArray(room?.players)) {
             setPlayers(room.players);
+        }
+        if (typeof room?.status === "string") {
+            setStatus(room.status);
         }
     }, [room]);
   
@@ -35,7 +39,9 @@ export const PlayerPanel: VFC = () => {
                 <Flex key={player.id} m={3} p={5} shadow='md' borderRadius="lg" bgColor={useColorModeValue("gray.100", "gray.700")}>
                     <Text fontWeight="bold">{player.name + (player.id === masterId ? ' 👑' : '')}</Text>
                     <Spacer />
+                    { status !== "waiting" && (
                     <Text>{player.score}</Text>
+                    )}
                 </Flex>
             ))}
             </Box>

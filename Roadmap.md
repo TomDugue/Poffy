@@ -14,6 +14,7 @@
  - Créer un system de loby (OK)
  - se connecter avec un Tag ou créer un nouveau (OK)
  - choisir le nombre de chanson (En cours)
+ - choisir le nombre de personne (En cours)
 ## 1.1
  - Systeme de gestion des loby
    - suppression si innactif
