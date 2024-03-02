@@ -4,11 +4,11 @@
  - Ecouter une musique - `Tom` (OK)
  ## 0.2
  - Ecouter une liste de musique prédéfini (tirer aléatoirement) `Tom` (OK)
- - Tester le titre de la chanson (en cours)
+ - Tester le titre de la chanson (OK)
  - Passer la chanson d'après `Tom` (OK)
  ## 0.3
- - Tester le titre/ l'auteur `Noémie` (en cours)
- - scorbord pendant et à la fin `Noémie` (en cours)
+ - Tester le titre/ l'auteur `Noémie` (OK)
+ - scorbord pendant et à la fin `Noémie` (partiel)
 # Version 1
 ## 1.0
  - Créer un system de loby (OK)
@@ -18,10 +18,10 @@
  - Systeme de gestion des loby
    - suppression si innactif
 ## 1.2
- - Tester les écriture alternaltive
+ - Tester les écriture alternaltive (en cours)
  - proposer la possibilité de ne pas tester les alternaltifs
 ## 1.3
- - Afficher le photo de l'album 
+ - Afficher le photo de l'album
  - temps limité pour trouvé (paramétrable)
 ## 1.4
  - Choisir la liste pour la partie :
