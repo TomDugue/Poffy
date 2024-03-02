@@ -44,3 +44,5 @@
  - modifier le nom des joueurs
  - arreter la musique à la fin
  - enlever le fait de pouvoir play/pause et changer le temps de la musique
+ - refaire des readme correcte
+ - netoyer le code example à la fin

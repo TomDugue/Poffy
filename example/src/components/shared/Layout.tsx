@@ -16,7 +16,7 @@ export const Layout: VFC<{
       templateRows="1fr auto">
       {!isMobile && <Box>{side}</Box>}
       <Box overflow="auto">{children}</Box>
-      <Box gridColumn="1 / -1">{bottom}</Box>
+      {/* <Box gridColumn="1 / -1">{bottom}</Box> */}
     </Grid>
   );
 };

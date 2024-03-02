@@ -1,12 +1,12 @@
 const { Server } = require("socket.io");
-const { distance } = require('fastest-levenshtein')
+const { distance } = require('fastest-levenshtein');
 
 const io = new Server({ /* options */ });
 
 
 let rooms = {};
 // rooms[roomid].id = "roomid"
-// rooms[roomid].players = [socketid1, socketid2, ...]
+// rooms[roomid].players = [{id:socketid, score:0, success:{name:true, artist:true}}, {id:socketid, score:0, success:{name:true, artist:true}}, ...]
 // rooms[roomid].master = socketid
 // rooms[roomid].status = "waiting" | "playing" | "finished"
 // rooms[roomid].playlist.Id = "playlistid"
@@ -14,12 +14,11 @@ let rooms = {};
 // rooms[roomid].rounds[roundnumber].uri = "songURI"
 // rooms[roomid].rounds[roundnumber].name = "songName"
 // rooms[roomid].rounds[roundnumber].artist = "artistName"
-// rooms[roomid].score = {socketid1: 0, socketid2: 0, ...}
-// rooms[roomid].success = {socketid1: {name:true, artist:true}, socketid2: {name:true, artist:true}, ...}
-// rooms[roomid].name = {socketid1: "name1", socketid2: "name2", ...}
 // rooms[roomid].roundNumber = 0
 // rooms[roomid].roundsNumber = 3
 // rooms[roomid].playersMax = 5
+
+// rooms[roomid].me = socketid
 
 let players = {};
 // players[socketid] = roomid
@@ -32,7 +31,7 @@ io.on("connection", (socket) => {
     */
     socket.on('CREATE_ROOM', () => {
         if (players[socket.id]) {
-            io.to(socket.id).emit('ROOM_UPDATE', rooms[players[socket.id]]);
+            sendRoom(socket.id);
             return;
         }
 
@@ -45,7 +44,7 @@ io.on("connection", (socket) => {
         rooms[roomid] = {
             id: roomid,
             version: 0,
-            players: [{id:socket.id, name: "Tom"}],
+            players: [{id:socket.id, name: "Master", score: 0, success: {name: false, artist: false}}],
             master: socket.id,
             status: "waiting",
             playlist: {
@@ -54,15 +53,12 @@ io.on("connection", (socket) => {
                 image: null
             },
             rounds: null,
-            score: {},
-            name: {},
-            success: {},
             roundNumber: -1,
             roundsNumber: 3,
             playersNumber: 5
         };
         players[socket.id] = roomid;
-        io.to(socket.id).emit('ROOM_UPDATE', rooms[roomid]);
+        sendRoom(socket.id);
     });
 
     /* UPDATE PARAMETERS
@@ -74,22 +70,21 @@ io.on("connection", (socket) => {
     socket.on('UPDATE_PARAMETERS', (room) => {
         // Check Authorization ////////////////////////////////////////
         if (!players[socket.id]) {
-            socket.emit('ERROR', 'You are not in any room');
+            sendError(socket.id, 'You are not in any room');
             return;
         }
         const roomid = players[socket.id];
         console.log(`[UPDATE_PARAMETERS] ${roomid}`);
         if (rooms[roomid].master !== socket.id) {
-            socket.emit('ERROR', 'You are not the master of this room');
+            sendError(socket.id, 'You are not the master of this room');
             return;
         }
         if(room.playlist === undefined && room.roundsNumber === undefined && room.playersMax === undefined && room.rounds === undefined) {
-            socket.emit('ERROR', 'No parameters to update');
+            sendError(socket.id, 'No parameters to update')
             return;
         }
 
         // Update parameters //////////////////////////////////////////
-        rooms[roomid].version += 1;
 
         // room.playlist = {id: "playlistid", name: "playlistname", image: "playlistimage"}
         if(room.playlist !== undefined) {
@@ -125,45 +120,43 @@ io.on("connection", (socket) => {
                     };
                 });
                 rooms[roomid].rounds = rounds;
+                console.log(`[UPDATE_PARAMETERS] ${roomid} rounds: ${room.rounds.length}`);
             } catch (error) {
-                console.log(error);
-                socket.emit('ERROR', 'Invalid rounds');
+                sendError(socket.id, 'Invalid rounds');
             }
-            console.log(`[UPDATE_PARAMETERS] ${roomid} rounds: ${room.rounds.length}`);
         }
         // Send update to all players /////////////////////////////////
-        rooms[roomid].players.forEach(player => {
-            io.to(player.id).emit('ROOM_UPDATE', rooms[roomid]);
-        });
+        sendRoomUpdate(roomid);
     });
 
+    // [x] Tom | Verify if track are set
     // NEW ROUND
     socket.on('NEXT_ROUND', () => {
         if (!players[socket.id]) {
-            socket.emit('ERROR', 'You are not in any room');
+            sendError(socket.id, 'You are not in any room');
             return;
         }
         const roomid = players[socket.id];
         console.log(`[NEXT_ROUND] ${roomid} by ${socket.id}`);
         if (rooms[roomid].master !== socket.id) {
-            socket.emit('ERROR', 'You are not the master of this room');
+            sendError(socket.id, 'You are not the master of this room');
             return;
         }
         console.log(`[NEXT_ROUND] 2 ${roomid}`);
         rooms[roomid].version += 1;
         rooms[roomid].roundNumber += 1;
         rooms[roomid].status = "playing";
-        rooms[roomid].success = {};
+        rooms[roomid].players.forEach(player => player = {...player, success: {name: false, artist: false}});
 
-        if (rooms[roomid].roundNumber > rooms[roomid].roundsNumber) {
+        if (rooms[roomid].roundNumber >= rooms[roomid].roundsNumber) {
             rooms[roomid].status = "finished";
             rooms[roomid].players.forEach(player => {
-                io.to(player.id).emit('GAME_OVER', rooms[roomid]);
+                sendRoom(player.id, 'STOP_ROUND');
             });
             return;
         }
         rooms[roomid].players.forEach(player => {
-            io.to(player.id).emit('ROUND_START', rooms[roomid]);
+            sendRoom(player.id, 'START_ROUND');
         });
         return;
     });
@@ -177,83 +170,79 @@ io.on("connection", (socket) => {
         }
 
         if (!rooms[roomid]) {
-            socket.emit('ERROR', 'Room not found');
+            sendError(socket.id, 'Room does not exist');
             return;
         }
 
         if (rooms[roomid].players.length >= rooms[roomid].playersMax) {
-            socket.emit('ERROR', 'Room is full');
+            sendError(socket.id, 'Room is full');
             return;
         }
 
         if (rooms[roomid].status !== "waiting") {
-            socket.emit('ERROR', 'Room is not available');
+            sendError(socket.id, 'Room is not waiting');
             return;
         }
 
-        rooms[roomid].version += 1;
-        rooms[roomid].players.push(socket.id);
+        rooms[roomid].players.push({id:socket.id, name: `player${rooms[roomid].players.length}`, score: 0, success: {name: false, artist: false}});
         players[socket.id] = roomid;
-        rooms[roomid].players.forEach(player => {
-            io.to(player.id).emit('PLAYER_JOIN', socket.id);
-        });
+        sendRoomUpdate(roomid);
     });
 
     // CHANGE NAME
     socket.on('CHANGE_NAME', (name) => {
         if (!players[socket.id]) {
-            socket.emit('ERROR', 'You are not in any room');
+            sendError(socket.id, 'You are not in any room');
             return;
         }
         const roomid = players[socket.id];
         
-        rooms[roomid].version += 1;
         console.log(`[CHANGE_NAME] ${socket.id} to ${name}`);
-        rooms[roomid].name[socket.id] = name;
-        rooms[roomid].players.forEach(player => {
-            io.to(player.id).emit('ROOM_UPDATE', rooms[roomid]);
-        });
+        changePlayer(socket.id, (p) => ({...p, name}));
+        sendRoomUpdate(roomid);
     });
 
     // GET ROOM
     socket.on('GET_ROOM', () => {
         console.log(`[GET_ROOM] ${socket.id}`);
         if (!players[socket.id]) {
-            socket.emit('ERROR', 'You are not in any room');
+            sendError(socket.id, 'You are not in any room');
             return;
         }
-        const roomid = players[socket.id];
-        io.to(socket.id).emit('ROOM_UPDATE', rooms[roomid]);
+        sendRoom(socket.id);
     });
 
     // TRY SONG
     socket.on('TRY_SONG', (s) => {
         console.log(`[TRY_SONG] ${socket.id} with ${s}`);
         if (!players[socket.id]) {
-            socket.emit('ERROR', 'You are not in any room');
+            sendError(socket.id, 'You are not in any room');
             return;
         }
         const roomid = players[socket.id];
         if (rooms[roomid].status !== "playing") {
-            socket.emit('ERROR', 'Room is not available');
+            sendError(socket.id, 'Room is not playing');
             return;
         }
         if (rooms[roomid].roundNumber === -1) {
-            socket.emit('ERROR', 'No song is playing');
+            sendError(socket.id, 'No round started');
             return;
         }
-        const {score, success} = test(s, rooms[roomid].success[socket.id], rooms[roomid].rounds[rooms[roomid].roundNumber].name, rooms[roomid].rounds[rooms[roomid].roundNumber].artist);
-        if (score === 0) {
-            socket.emit('ERROR', 'No match');
-            return;
-        }
-        rooms[roomid].score[socket.id] += score;
-        rooms[roomid].success[socket.id] = success;
-        
-        rooms[roomid].version += 1;
-        rooms[roomid].players.forEach(player => {
-            io.to(player.id).emit('ROOM_UPDATE', rooms[roomid]);
+
+        const cRound = rooms[roomid].rounds[rooms[roomid].roundNumber];
+        let changed = true;
+
+        changePlayer(socket.id, (p) => {
+            const {score, success} = test(s, p.success, cRound.name, cRound.artist);
+            if (score === 0) {
+                changed = false;
+                sendError(socket.id, 'No match');
+                return p;
+            }
+            return {...p, score: p.score + score, success};
         });
+
+        if (changed) sendRoomUpdate(roomid);
     });
 
     // LEAVE ROOM
@@ -286,7 +275,7 @@ function test(s, success, name, artist) {
     if (success.name !== true) {
         if(distance(s, name) <= name.length*0.25) {
             score += 1;
-            success.artist = true;
+            success.name = true;
         }
     }
     if (success.artist !== true) {
@@ -308,20 +297,40 @@ function handleDisconnect(socket) {
     const roomid = players[socket.id];
     delete players[socket.id];
     
-    rooms[roomid].version += 1;
+    rooms[roomid].players = rooms[roomid].players.filter(player => player !== socket.id);
     if (rooms[roomid].master === socket.id) {
-        // socket.id is the master of the room
         rooms[roomid].players.forEach(player => {
-            if (player !== socket.id) {
-                io.to(player.id).emit('ROOM_DESTROYED');
-            }
+            sendError(player.id, 'Master left the room');
             delete players[player];
         });
         delete rooms[roomid];
     } else {
-        rooms[roomid].players = rooms[roomid].players.filter(player => player !== socket.id);
-        rooms[roomid].players.forEach(player => {
-            io.to(player.id).emit('PLAYER_LEFT', socket.id);
-        });
+        sendRoomUpdate(roomid);
     }
 }
+
+function sendRoomUpdate (roomid) {
+    rooms[roomid].version += 1;
+    rooms[roomid].players.forEach(player => sendRoom(player.id));
+}
+
+function sendRoom (socketid, event = 'ROOM_UPDATE') {
+    if (!players[socketid]) {
+        throw new Error('Socket is not in any room');
+    }
+    const roomid = players[socketid];
+    io.to(socketid).emit(event, {...rooms[roomid], me: socketid});
+}
+
+function sendError (socketid, error) {
+    io.to(socketid).emit('ERROR', error);
+}
+
+function changePlayer (socketid, changer) {
+    rooms[players[socketid]].players = rooms[players[socketid]].players.map(p => {
+        if (p.id === socketid) {
+            return changer(p);
+        }
+        return p;
+    });
+};

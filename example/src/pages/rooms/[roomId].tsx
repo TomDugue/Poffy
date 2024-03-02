@@ -7,7 +7,7 @@ const Page: NextPage = () => {
   const router = useRouter();
   const roomId = router.query.roomId as string;
   console.log(roomId);
-  return <RoomPage roomId={roomId} />;
+  return <RoomPage Id={roomId} />;
 };
 
 export default withAuth(Page);

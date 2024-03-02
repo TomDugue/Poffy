@@ -42,7 +42,7 @@ export const RoomContextProvider: VFC<{ children: ReactNode }> = ({ children }) 
   const handleRoundStop = async (newroom: any) => {
     console.log("Round Stop");
     handleRoomUpdate((newroom))
-    // await spotifyClient.pause();
+    await spotifyClient.pause();
   };
   
   const handleError = (error: any) => {
@@ -58,16 +58,16 @@ export const RoomContextProvider: VFC<{ children: ReactNode }> = ({ children }) 
   useEffect(() => {
     // subscribe to socket events
     socket.on("ROOM_UPDATE", handleRoomUpdate);
-    socket.on("ROUND_START", handleRoundStart);
-    socket.on("GAME_OVER", handleRoundStop);
+    socket.on("START_ROUND", handleRoundStart);
+    socket.on("STOP_ROUND", handleRoundStop);
     socket.on("ERROR", handleError);
   
     return () => {
       // before the component is destroyed
       // unbind all event handlers used in this component
       socket.off("ROOM_UPDATE", handleRoomUpdate);
-      socket.off("ROUND_START", handleRoundStart);
-      socket.off("GAME_OVER", handleRoundStop);
+      socket.off("START_ROUND", handleRoundStart);
+      socket.off("STOP_ROUND", handleRoundStop);
       socket.off("ERROR", handleError);
     };
   }, [handleRoomUpdate, handleRoundStart, handleRoundStop, handleError]);

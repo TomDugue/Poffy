@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useContext, useEffect, useState, VFC } from "react";
+import { Suspense, useEffect, useState, VFC } from "react";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { Layout } from "../shared/Layout";
 import { PageFallback } from "../shared/PageFallback";
@@ -31,7 +31,7 @@ export const RoomMasterPage: VFC = () => {
     <ErrorBoundary>
       <Suspense fallback={<PageFallback />}>
         <Layout side={<SideNavigation/>} bottom={<ResponsiveBottom />}>
-          { !(roomId === undefined) && (<RoomPageContent roomId={roomId} />)}
+          { !(roomId === undefined) && (<RoomPageContent/>)}
         </Layout>
       </Suspense>
     </ErrorBoundary>
