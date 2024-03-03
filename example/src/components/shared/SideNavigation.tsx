@@ -9,6 +9,12 @@ import {
   SkeletonText,
   Button,
   Image,
+  Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
 } from "@chakra-ui/react";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
@@ -28,8 +34,34 @@ const useLinkColor = (isActive: boolean) => {
 export const SideNavigation: VFC = () => {
   const router = useRouter();
   const room = useRoom();
+  const socket = useSocket();
   
   const [playlist, setPlaylist] = useState<{id:string, name:string, image:string} | undefined>(undefined);
+  const [playerMax, setPlayerMax] = useState<number>(5);
+  const [songsNumber, setSongsNumber] = useState<number>(3);
+
+  const handleChangeRounds = (valueString: string) => {
+    const value = parseInt(valueString, 10);
+    if (value > 15) {
+      setSongsNumber(15);
+    } else if (value < 3) {
+      setSongsNumber(3);
+    } else {
+      socket.emit("UPDATE_PARAMETERS", {roundsNumber: value});
+    }
+
+  }
+
+  const handleChangePlayerMax = (valueString: string) => {
+    const value = parseInt(valueString, 10);
+    if (value > 10) {
+      setPlayerMax(10);
+    } else if (value < 1) {
+      setPlayerMax(1);
+    } else {
+      socket.emit("UPDATE_PARAMETERS", {playersMax: value});
+    }
+  }
 
   useEffect(() => {
     if (typeof room?.playlist?.id === "string"
@@ -41,6 +73,12 @@ export const SideNavigation: VFC = () => {
         image:room.playlist.image
       });
     }
+    if (typeof room?.playersMax === "number") {
+      setPlayerMax(room.playersMax);
+    }
+    if (typeof room?.roundsNumber === "number") {
+      setSongsNumber(room.roundsNumber);
+    }
   }, [room]);
 
   return (
@@ -48,41 +86,48 @@ export const SideNavigation: VFC = () => {
       <Text as="span" fontWeight="bold" fontSize={28}>
         Parameters
       </Text>
-      { playlist === undefined ? (
-        <Button
-          mt="4"
-          onClick={() => router.push(pagesPath.search.$url())}
-          colorScheme="blue"
-          variant="outline"
-        >
-          Set the Playlist
-        </Button>
-      ) : (
-        <Playlist playlist={playlist}/>
-      )}
+      <Stack mt="4">
+        <Text as="span" fontWeight="bold">
+          Players number
+        </Text>
+        <NumberInput onChange={handleChangePlayerMax} step={1} defaultValue={playerMax} min={1} max={10}>
+          <NumberInputField />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      </Stack>
+      <Stack mt="4">
+        <Text as="span" fontWeight="bold">
+          Round number
+        </Text>
+        <NumberInput onChange={handleChangeRounds} step={1} defaultValue={songsNumber} min={3} max={15}>
+          <NumberInputField />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      </Stack>
+      <Stack mt="4">
+        <Text as="span" fontWeight="bold">
+          Playlist
+        </Text>
+        { playlist === undefined ? (
+          <Button
+            mt="4"
+            onClick={() => router.push(pagesPath.search.$url())}
+            colorScheme="blue"
+            variant="outline"
+          >
+            Set the Playlist
+          </Button>
+        ) : (
+          <Playlist playlist={playlist}/>
+        )}
+      </Stack>
     </Box>
-  );
-};
-
-const PlaylistLink: VFC<{
-  playlist: SpotifyApi.PlaylistObjectSimplified;
-}> = ({ playlist }) => {
-  const router = useRouter();
-  const href = pagesPath.playlists._playlistId(playlist.id).$url();
-
-  const isActive =
-    router.pathname === href.pathname &&
-    router.query.playlistId === href.query.playlistId;
-
-  return (
-    <NextLink href={href} passHref>
-      <Link
-        noOfLines={1}
-        color={useLinkColor(isActive)}
-        fontWeight={isActive ? "bold" : undefined}>
-        {playlist.name}
-      </Link>
-    </NextLink>
   );
 };
 
@@ -129,23 +174,6 @@ const Playlist: VFC<{ playlist: {id:string, name:string, image:string} }> = ({ p
 
   return (
     <>
-      <Stack
-        borderRadius="lg"
-        p="6"
-        bgColor={useColorModeValue("gray.100", "gray.700")}>
-        <Box height="32" width="32">
-          <Image
-            height="32"
-            width="32"
-            src={playlist.image}
-            alt={playlist.name}
-            borderRadius="xl"
-          />
-        </Box>
-        <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
-          {playlist.name}
-        </Text>
-      </Stack>
       <Button
         mt="4"
         onClick={() => {if(status === "waiting") router.push(pagesPath.search.$url())}}

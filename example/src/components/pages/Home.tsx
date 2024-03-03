@@ -32,7 +32,7 @@ export const HomePage: VFC = () => {
 };
 
 const HomePageContent: VFC = () => {
-  // [ ] Syndelle | This is the page to chose between master or invitee
+  // [x] Syndelle | This is the page to chose between master or invitee
   return (
     <WithHeader header={<Header bgColor={useColorModeValue("white", "gray.800")} />}>
       <Center position="fixed" inset={0}>
@@ -72,7 +72,7 @@ const CreateRoom: VFC = memo(() => {
 });
 
 const JoinRoom: VFC = memo(() => {
-  // [ ] Syndelle | Complete JoinRoom component
+  // [x] Syndelle | Complete JoinRoom component
   // [x] Tom | Add a text input to enter the room id
   const [roomid, setRoomId] = useState("000000");
   return (

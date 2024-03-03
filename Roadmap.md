@@ -13,16 +13,16 @@
 ## 1.0
  - Créer un system de loby (OK)
  - se connecter avec un Tag ou créer un nouveau (OK)
- - choisir le nombre de chanson (En cours)
- - choisir le nombre de personne (En cours)
+ - choisir le nombre de chanson (Ok)
+ - choisir le nombre de personne (Ok)
 ## 1.1
  - Systeme de gestion des loby
    - suppression si innactif
 ## 1.2
- - Tester les écriture alternaltive (en cours)
+ - Tester les écritures alternaltives (en cours)
  - proposer la possibilité de ne pas tester les alternaltifs
 ## 1.3
- - Afficher le photo de l'album
+ - Afficher le photo de l'album (OK)
  - temps limité pour trouvé (paramétrable)
 ## 1.4
  - Choisir la liste pour la partie :
@@ -36,14 +36,7 @@
 
 
  RESTE A FAIRE :
- - score board
- - afficher le titre de la chanson a la fin
- - afficher si trouvé ou non
- - afficher le temps
- - afficher les joueurs avec leur score
- - ajouter les autres paramètres (temps, nombre de chanson, etc...)
  - modifier le nom des joueurs
  - arreter la musique à la fin
- - enlever le fait de pouvoir play/pause et changer le temps de la musique
  - refaire des readme correcte
  - netoyer le code example à la fin

@@ -12,6 +12,7 @@ const SocketContext = React.createContext<typeof socket | undefined>(undefined);
 const RoomContext = React.createContext<any | undefined>(undefined);
 
 // [x] Tom | When start, the current song is not actualisate wet
+// [ ] Tom | renitialize the buffer on new round
 export const RoomContextProvider: VFC<{ children: ReactNode }> = ({ children }) => {
   const [room, setRoom] = useState<any>({});
   const spotifyClient = useSpotifyClient();
@@ -21,10 +22,9 @@ export const RoomContextProvider: VFC<{ children: ReactNode }> = ({ children }) 
   const toast = useToast()
   
   const handleRoomUpdate = (newroom:any) => {
-    console.log("Room update");
+    console.log("Room update: ", newroom);
     if(newroom?.version <= room?.version) return;
     setRoom(newroom);
-    console.log("Room update: ", newroom);
   };
   
   const handleRoundStart = async (newroom: any) => {

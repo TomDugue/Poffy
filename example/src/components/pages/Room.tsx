@@ -1,4 +1,4 @@
-import { Box, Heading, HStack,Input, useColorModeValue, Text, Center, Grid, Stack, Progress } from "@chakra-ui/react";
+import { Box, Heading, HStack,Input, useColorModeValue, Text, Grid, Stack, Progress, Image, Skeleton, VStack } from "@chakra-ui/react";
 import { Suspense, useEffect, useState, VFC } from "react";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { Header } from "../shared/Header";
@@ -51,7 +51,7 @@ export const RoomPageContent:VFC = () => {
           h="full"
           templateColumns="1fr auto"
           >
-          <Box><RoomPlayeGround/></Box>
+          <Box><RoomPlayGround/></Box>
           {!ismobile && <Box overflow="auto"><PlayerPanel/></Box> }
           </Grid>
     </WithHeader>
@@ -59,7 +59,7 @@ export const RoomPageContent:VFC = () => {
 };
 
 
-const RoomPlayeGround: VFC = () => {
+const RoomPlayGround: VFC = () => {
   const socket = useSocket();
   const room = useRoom();
 
@@ -73,6 +73,7 @@ const RoomPlayeGround: VFC = () => {
   const [successTitle, setSuccessTitle] = useState<boolean>(false);
   const [curentArtist, setCurrentArtist] = useState<string>("");
   const [currentTitle, setCurrentTitle] = useState<string>("");
+  const [playlist, setPlaylist] = useState<{id:string, name:string, image:string} | undefined>(undefined);
 
   useEffect(() => {
     if (typeof room?.status === "string") {
@@ -97,14 +98,22 @@ const RoomPlayeGround: VFC = () => {
       setCurrentArtist(room?.rounds[room?.roundNumber].artist);
       setCurrentTitle(room?.rounds[room?.roundNumber].name);
     }
-
+    if (typeof room?.playlist?.id === "string"
+      && typeof room?.playlist?.name === "string"
+      && typeof room?.playlist?.image === "string") {
+      setPlaylist({
+        id:room.playlist.id,
+        name:room.playlist.name,
+        image:room.playlist.image
+      });
+    }
   }, [room]);
 
   return (
-    <Center inset={0}>
+    <Stack mt={16} spacing={5}>
           {// [ ] Noémie | Put in copyboard the link to the room
           status === "waiting" && (
-            <HStack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
+            <HStack px="4" mx="auto">
               <Box p={5} shadow='md'
                   borderRadius="lg"
                   bgColor={useColorModeValue("gray.100", "gray.700")}>
@@ -115,6 +124,44 @@ const RoomPlayeGround: VFC = () => {
               </Box>
             </HStack>
           )}
+          
+          <HStack px="4" mx="auto">
+            <VStack
+            borderRadius="lg"
+            p="5"
+            mx="auto"
+            bgColor={useColorModeValue("gray.100", "gray.700")}>
+              { // [x] Tom | Display the playlist
+                playlist !== undefined ? (
+                  <>
+                    <Box height="32" width="32">
+                      <Image
+                        height="32"
+                        width="32"
+                        src={playlist.image}
+                        alt={playlist.name}
+                        borderRadius="xl"
+                      />
+                    </Box>
+                    <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
+                      {playlist.name}
+                    </Text>
+                  </>
+              ):(
+                <>
+                  <Skeleton 
+                      height="32"
+                      width="32"
+                      borderRadius="xl"
+                      startColor='green.500' endColor='green.400'
+                    />
+                  <Text as="span" fontWeight="bold" noOfLines={1} wordBreak="break-all">
+                    Playlist not selected
+                  </Text>
+                </>
+              )}
+            </VStack>
+          </HStack>
           {// [ ] Noémie | Display the input and send it to the server
           status === "playing" && (
             <Stack px="4" marginTop="16" paddingBottom="24" alignItems="flex-start" spacing="5">
@@ -134,7 +181,7 @@ const RoomPlayeGround: VFC = () => {
                     <Text as="span" fontSize="xs">
                       {formatDurationMS(state?.position ?? 0)}
                     </Text>
-                    <Progress w={250} value={state?.position ?? 0} max={state?.duration ?? 0} />
+                    <Progress w="full" value={state?.position ?? 0} max={state?.duration ?? 0} />
                     <Text as="span" fontSize="xs">
                       {formatDurationMS(state?.duration ?? 0)}
                     </Text>
@@ -142,15 +189,23 @@ const RoomPlayeGround: VFC = () => {
                 )}
               />
               {/*Show if the artist or the title is correct*/}
-              <Box p={5} shadow='md'
-                  borderRadius="lg"
-                  bgColor={useColorModeValue("gray.100", "gray.700")}>
-                  <Heading fontSize='xl'>Success</Heading>
-                  <Text mt={4}>
-                    {successArtist && "You find the artist : " + curentArtist}
+              <Box p={5}>
+              {successArtist && (
+                <HStack>
+                  <svg height={16} viewBox="0 0 24 24" focusable="false"><path fill="green" d="M12,0A12,12,0,1,0,24,12,12.014,12.014,0,0,0,12,0Zm6.927,8.2-6.845,9.289a1.011,1.011,0,0,1-1.43.188L5.764,13.769a1,1,0,1,1,1.25-1.562l4.076,3.261,6.227-8.451A1,1,0,1,1,18.927,8.2Z"></path></svg>
+                  <Text mt={4}> 
+                    Artist : {curentArtist}
                   </Text>
-                  <Text mt={4}>
-                    {successTitle && "You find the title : " + currentTitle}</Text>
+                </HStack>
+              )}
+              {successTitle && (
+                <HStack>
+                  <svg height={16} viewBox="0 0 24 24" focusable="false"><path fill="green" d="M12,0A12,12,0,1,0,24,12,12.014,12.014,0,0,0,12,0Zm6.927,8.2-6.845,9.289a1.011,1.011,0,0,1-1.43.188L5.764,13.769a1,1,0,1,1,1.25-1.562l4.076,3.261,6.227-8.451A1,1,0,1,1,18.927,8.2Z"></path></svg>
+                  <Text mt={4}> 
+                    Title : {currentTitle}
+                  </Text>
+                </HStack>
+              )}
               </Box>
             </Stack>
           )}
@@ -165,6 +220,6 @@ const RoomPlayeGround: VFC = () => {
             </Box>
             </HStack>
           )}
-        </Center>
+        </Stack>
   );
 };

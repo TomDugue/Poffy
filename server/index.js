@@ -66,6 +66,7 @@ io.on("connection", (socket) => {
     * room.roundsNumber = 3
     * room.playersMax = 5
     * room.rounds = [{uri: "songURI", name: "songname", artist: "artistname"}, ...]
+    * // [ ] Tom | add min/max values for roundsNumber and playersMax
     */
     socket.on('UPDATE_PARAMETERS', (room) => {
         // Check Authorization ////////////////////////////////////////
@@ -77,6 +78,10 @@ io.on("connection", (socket) => {
         console.log(`[UPDATE_PARAMETERS] ${roomid}`);
         if (rooms[roomid].master !== socket.id) {
             sendError(socket.id, 'You are not the master of this room');
+            return;
+        }
+        if (rooms[roomid].status !== "waiting") {
+            sendError(socket.id, 'Room is already strated');
             return;
         }
         if(room.playlist === undefined && room.roundsNumber === undefined && room.playersMax === undefined && room.rounds === undefined) {
@@ -146,7 +151,7 @@ io.on("connection", (socket) => {
         rooms[roomid].version += 1;
         rooms[roomid].roundNumber += 1;
         rooms[roomid].status = "playing";
-        rooms[roomid].players.forEach(player => player = {...player, success: {name: false, artist: false}});
+        changePlayer(rooms[roomid].master, (p) => ({...p, success: {name: false, artist: false}}), true);
 
         if (rooms[roomid].roundNumber >= rooms[roomid].roundsNumber) {
             rooms[roomid].status = "finished";
@@ -297,7 +302,7 @@ function handleDisconnect(socket) {
     const roomid = players[socket.id];
     delete players[socket.id];
     
-    rooms[roomid].players = rooms[roomid].players.filter(player => player !== socket.id);
+    rooms[roomid].players = rooms[roomid].players.filter(player => player.id !== socket.id);
     if (rooms[roomid].master === socket.id) {
         rooms[roomid].players.forEach(player => {
             sendError(player.id, 'Master left the room');
@@ -326,9 +331,9 @@ function sendError (socketid, error) {
     io.to(socketid).emit('ERROR', error);
 }
 
-function changePlayer (socketid, changer) {
+function changePlayer (socketid, changer, all = false) {
     rooms[players[socketid]].players = rooms[players[socketid]].players.map(p => {
-        if (p.id === socketid) {
+        if (p.id === socketid || all) {
             return changer(p);
         }
         return p;

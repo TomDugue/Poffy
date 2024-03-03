@@ -1,19 +1,18 @@
-import { Button, Center, Image } from "@chakra-ui/react";
+import { Button, Center, Image, Stack,Text } from "@chakra-ui/react";
 import { VFC } from "react";
 import { staticPath } from "../../lib/$path";
 
 export const LoginPage: VFC = () => {
-  // [ ] Syndelle | Complete LoginPage component
+  // [x] Syndelle | Complete LoginPage component
 
   return (
     <Center position="fixed" inset={0}>
-      <div className="card p-4">
-        <div className="masthead-heading "> Welcome to Poffy </div>
-        <div className="masthead-subheading text-uppercase"> Do you want to play Poffy? </div>
+      <Stack align="center" className="card p-4">
+        <Image src={staticPath.assets.poffy_favicon_png} alt="Logo Poffy" />
         <Button
           as="a"
           href="/api/login"
-          variant="ghost"
+          variant="outline"
           size="lg"
           fontSize="2xl"
           fontWeight="bold"
@@ -22,7 +21,7 @@ export const LoginPage: VFC = () => {
           }>
           Sign in with
         </Button>
-      </div>
+      </Stack>
     </Center>
   );
 };
