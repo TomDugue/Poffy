@@ -20,14 +20,13 @@ Spotify API
 Socket.io
 
 # Link to play :
-- Soon
+- Pas de lien pour jouer pour le moment. L'application est en cours de développement et est accessible à un nombre limité de compte Spotify.
 
 # Bugs
-- To complete
-
-
-
-
+- Pas de redirection (page vide) si la game est pleine, en partie ou si le code est invalide
+- Recharger la page réinitialise la connexion (ajouter des cookies pour garder la connexion)
+- Pas de verification sur les paramètres de la partie (nombre de chanson, nombre de joueur, ...)
+- Possibilité de rejoindre deux fois avec le même compte Spotify (et donc problème de racing entre les deux clients)
 
 ## Installation
 You must have nodejs installed on your machine.
@@ -36,14 +35,14 @@ You must have nodejs installed on your machine.
 git clone https://github.com/TomDugue/Poffy.git
 cd poffy
 cd client && npm install
-cd ../api && npm install
+cd ../server && npm install
 ```
 
 ## Update
 ```bash
 git pull
 cd client && npm install
-cd ../api && npm install
+cd ../server && npm install
 ```
 
 ## Run
@@ -52,5 +51,5 @@ To start the project you must run the following commands in two different termin
 cd client && npm start
 ```
 ```bash
-cd api && npm start
+cd server && npm start
 ```

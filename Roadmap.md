@@ -8,7 +8,7 @@
  - Passer la chanson d'après `Tom` (OK)
  ## 0.3
  - Tester le titre/ l'auteur `Noémie` (OK)
- - scorbord pendant et à la fin `Noémie` (partiel)
+ - scorbord pendant et à la fin `Noémie` (en cours)
 # Version 1
 ## 1.0
  - Créer un system de loby (OK)
@@ -18,6 +18,7 @@
 ## 1.1
  - Systeme de gestion des loby
    - suppression si innactif
+ - modifier le nom des joueurs (en cours)
 ## 1.2
  - Tester les écritures alternaltives (en cours)
  - proposer la possibilité de ne pas tester les alternaltifs
@@ -32,11 +33,3 @@
 # Version 2
 ## 2.0
  - Afficher la vidéo du clip
-
-
-
- RESTE A FAIRE :
- - modifier le nom des joueurs
- - arreter la musique à la fin
- - refaire des readme correcte
- - netoyer le code example à la fin
